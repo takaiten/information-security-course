@@ -1,12 +1,9 @@
-#include <iostream>
-
 #include "ripemd.hpp"
 
-using namespace RIPEMD;
-
-int main() {
-    auto *md = new RIPEMD320();
-    md->hash((uint8_t*)("abc"), 3);
-
+int main()
+{
+    RIPEMD_320 hash;
+    hash.read_message("");
+    cout << hash.ripemd_320();
     return 0;
 }

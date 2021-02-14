@@ -1,132 +1,189 @@
-#include <cstring>
 #include "ripemd.hpp"
 
-//#include <bits/stdc++.h>
-//
-//void strToBinary(string s)
-//{
-//    int n = s.length();
-//
-//
-//    for (int i = 0; i <= n; i++)
-//    {
-//        // convert each char to
-//        // ASCII value
-//        int val = int(s[i]);
-//
-//        // Convert ASCII value to binary
-//        string bin = "";
-//        while (val > 0)
-//        {
-//            (val % 2)? bin.push_back('1') :
-//            bin.push_back('0');
-//            val /= 2;
-//        }
-//        reverse(bin.begin(), bin.end());
-//
-//        cout << bin << " ";
-//    }
-//}
+unsigned int RIPEMD_320::F(unsigned int j, unsigned int x, unsigned int y, unsigned int z)  //Нелинейная побитовая функция F
+{
+    if (j <= 15)
+        return x ^ y^ z;
+    else if (j <= 31)
+        return (x & y) | (~x & z);
+    else if (j <= 47)
+        return (x | ~y) ^ z;
+    else if (j <= 63)
+        return (x & z) | (y & ~z);
+    else if (j <= 79)
+        return x ^ (y | ~z);
+    else
+        return 0;
+}
 
-uint32_t RIPEMD::Helpers::f(const uint8_t j, uint16_t x, uint16_t y, uint16_t z) {
-    switch (j) {
-        case 0 ... 15:
-            return x ^ y ^ z;
-        case 16 ... 31:
-            return (x & y) | (~x & z);
-        case 32 ... 47:
-            return (x | ~y) ^ z;
-        case 48 ... 63:
-            return (x & z) | (y & ~z);
-        case 64 ... 79:
-            return x ^ (y | ~z);
-        default:
-            throw invalid_argument("Helpers::f: j must be in range from 0 to 70");
+unsigned int RIPEMD_320::K1(unsigned int j)                                                 //Добавляемые 16-ичные константы
+{
+    if (j <= 15)
+        return 0x00000000;
+    else if (j <= 31)
+        return 0x5A827999;
+    else if (j <= 47)
+        return 0x6ED9EBA1;
+    else if (j <= 63)
+        return 0x8F1BBCDC;
+    else if (j <= 79)
+        return 0xA953FD4E;
+    else
+        return 0;
+}
+
+unsigned int RIPEMD_320::K2(unsigned int j)                                                 //Добавляемые 16-ичные константы
+{
+    if (j <= 15)
+        return 0x50A28BE6;
+    else if (j <= 31)
+        return 0x5C4DD124;
+    else if (j <= 47)
+        return 0x6D703EF3;
+    else if (j <= 63)
+        return 0x7A6D76E9;
+    else if (j <= 79)
+        return 0x00000000;
+    else
+        return 0;
+}
+
+unsigned int RIPEMD_320::inv(unsigned int value)                                            //Смена порядка бит
+{
+    unsigned int res = 0;
+
+    res |= ((value >> 0) & 0xFF) << 24;
+    res |= ((value >> 8) & 0xFF) << 16;
+    res |= ((value >> 16) & 0xFF) << 8;
+    res |= ((value >> 24) & 0xFF) << 0;
+
+    return res;
+}
+
+unsigned int RIPEMD_320::bytes_to_uint(char* bytes)                                         //Преобразование 4-х байт в unsigned int
+{
+    unsigned int res = 0;
+
+    res |= ((unsigned int)bytes[3] << 24) & 0xFF000000;
+    res |= ((unsigned int)bytes[2] << 16) & 0xFF0000;
+    res |= ((unsigned int)bytes[1] << 8) & 0xFF00;
+    res |= ((unsigned int)bytes[0] << 0) & 0xFF;
+
+    return res;
+}
+
+void  RIPEMD_320::read_message(string str){ message = str; }                                // Считывание сообщения
+
+void RIPEMD_320::extension()                                                                //Добавление дополнительных битов
+{
+    bitlen = message.size() * 8;                                                            //Исходная длина сообщения в битах
+
+    message.push_back((unsigned char)0x80);                                              //Добавляем в конец сообщения единичный бит
+
+    while ((message.size() * 8) % 512 != 448)                                               //До тех пор, пока длина сообщения не станет равной 448(mod 512),
+        message.push_back(0);                                                               //Заполняем сообщение нулями
+
+    blocks = (unsigned int)(message.size() / 64) + 1;                                       //Количество блоков для обработки
+}
+
+void RIPEMD_320::adding_length()                                                            //Добавление исходной длины сообщения
+{
+    X = new unsigned int*[blocks];                                                          //X - массив массивов блоков по 64 байта(512 бит)
+
+    for (unsigned int i = 0; i < blocks; i++)
+    {
+        X[i] = new unsigned int[16];
+
+        for (int j = 0; j < (i == blocks - 1 ? 14 : 16); j++)                               //Если это не последний блок, то переносим преобразованное message в X,
+            X[i][j] = bytes_to_uint(&message[(j * 4) + 64 * i]);                      //Если блок послений, то делаем то же самое, но оставляем 8 байт под bitlen
+
+        if (i == blocks - 1)                                                                //Если это последний блок
+        {
+            X[i][14] = bitlen & 0xFFFFFFFF;                                                 //добавляются младшие 64 бита, взятые из побитового представления
+            X[i][15] = bitlen >> 32 & 0xFFFFFFFF;                                           //исходной длина сообщения
+        }
     }
 }
 
-uint16_t RIPEMD::Helpers::K1(const uint8_t j) {
-    switch (j) {
-        case 0 ... 15:
-            return 0;
-        case 16 ... 31:
-            return (uint16_t)0x5a827999;
-        case 32 ... 47:
-            return (uint16_t)0x6ed9eba1;
-        case 48 ... 63:
-            return (uint16_t)0x8f1bbcdc;
-        case 64 ... 79:
-            return (uint16_t)0xa953fd4e;
-        default:
-            throw invalid_argument("Helpers::K1: j must be in range from 0 to 70");
-    }
+void RIPEMD_320::initialize_ripemd()                                                        //Инициализация буфера
+{
+    H0 = 0x67452301, H1 = 0xEFCDAB89, H2 = 0x98BADCFE, H3 = 0x10325476, H4 = 0xC3D2E1F0;
+    H5 = 0x76543210, H6 = 0xFEDCBA98, H7 = 0x89ABCDEF, H8 = 0x01234567, H9 = 0x3C2D1E0F;
 }
 
-uint16_t RIPEMD::Helpers::K2(const uint8_t j) {
-    switch (j) {
-        case 0 ... 15:
-            return (uint16_t)0x50a28be6;
-        case 16 ... 31:
-            return (uint16_t)0x5c4dd124;
-        case 32 ... 47:
-            return (uint16_t)0x6d703ef3;
-        case 48 ... 63:
-            return (uint16_t)0x7a6d76e9;
-        case 64 ... 79:
-            return 0;
-        default:
-            throw invalid_argument("Helpers::K2: j must be in range from 0 to 70");
-    }
-}
+//Номера выбираемых из сообщения 32-битных слов
 
-void RIPEMD::RIPEMD320::append_additional_bits() {
-//    msg += '1';
-//
-//    while (msg.length() % 512 != 448) {
-//        msg += '0';
-//    }
-}
+unsigned int R1[] = {   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                        7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8,
+                        3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12,
+                        1, 9, 11, 10, 0, 8, 12, 4, 13, 3, 7, 15, 14, 5, 6, 2,
+                        4, 0, 5, 9, 7, 12, 2, 10, 14, 1, 3, 8, 11, 6, 15, 13 };
 
-void RIPEMD::RIPEMD320::append_msg_length_bits() {
-//    bitset<64> length_bitset(initial_length);
-//    string bitset_string = length_bitset.to_string();
-//
-//    msg.append(bitset_string.substr(32, 32));
-//    msg.append(bitset_string.substr(0, 32));
-}
+unsigned int R2[] = {   5, 14, 7, 0, 9, 2, 11, 4, 13, 6, 15, 8, 1, 10, 3, 12,
+                        6, 11, 3, 7, 0, 13, 5, 10, 14, 15, 8, 12, 4, 9, 1, 2,
+                        15, 5, 1, 3, 7, 14, 6, 9, 11, 8, 12, 2, 10, 0, 4, 13,
+                        8, 6, 4, 1, 3, 11, 15, 0, 5, 12, 2, 13, 9, 7, 10, 14,
+                        12, 15, 10, 4, 1, 5, 8, 7, 6, 2, 13, 14, 0, 3, 9, 11 };
 
-void RIPEMD::RIPEMD320::hash(const uint8_t* msg, uint32_t msg_len) {
-//    int j;
-//    for (uint32_t i = 0; i < (msg_len >> 6); ++i) {
-//        uint32_t chunk[16];
-//
-//        for (j = 0; j < 16; ++j) {
-//            chunk[j] = (uint32_t)(*(msg++));
-//            chunk[j] |= (uint32_t)(*(msg++)) << 8;
-//            chunk[j] |= (uint32_t)(*(msg++)) << 16;
-//            chunk[j] |= (uint32_t)(*(msg++)) << 24;
-//        }
-//
-//        compress(digest, chunk);
-//    }
-    uint32_t chunk[16] = {0};
+//Количество бит, на которое будут осуществляться сдвиги
 
-    for (uint32_t i = 0; i < (msg_len & 63); ++i) {
-        chunk[i >> 2] ^= (uint32_t)*msg++ << ((i & 3) << 3);
+unsigned int S1[] = {   11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8,
+                        7, 6, 8, 13, 11, 9, 7, 15, 7, 12, 15, 9, 11, 7, 13, 12,
+                        11, 13, 6, 7, 14, 9, 13, 15, 14, 8, 13, 6, 5, 12, 7, 5,
+                        11, 12, 14, 15, 14, 15, 9, 8, 9, 14, 5, 6, 8, 6, 5, 12,
+                        9, 15, 5, 11, 6, 8, 13, 12, 5, 12, 13, 14, 11, 8, 5, 6 };
+
+unsigned int S2[] = {   8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6,
+                        9, 13, 15, 7, 12, 8, 9, 11, 7, 7, 12, 7, 6, 15, 13, 11,
+                        9, 7, 15, 11, 8, 6, 6, 14, 12, 13, 5, 14, 13, 13, 7, 5,
+                        15, 5, 8, 11, 14, 14, 6, 14, 6, 9, 12, 9, 12, 5, 15, 8,
+                        8, 5, 12, 9, 12, 5, 14, 6, 8, 13, 6, 5, 15, 13, 11, 11 };
+
+void RIPEMD_320::message_processing()                                                       //Обработка сообщения в блоках
+{
+    for (unsigned int i = 0; i < blocks; i++)                                               //Цикл блоков сообщения
+    {
+        A1 = H0, B1 = H1, C1 = H2, D1 = H3, E1 = H4;
+        A2 = H5, B2 = H6, C2 = H7, D2 = H8, E2 = H9;
+
+        //Магия
+        for (unsigned int j = 0; j < 80; j++)
+        {
+            T = ROTATE_LEFT((A1 + F(j, B1, C1, D1) + X[i][R1[j]] + K1(j)), S1[j]) + E1;
+
+            A1 = E1, E1 = D1, D1 = ROTATE_LEFT(C1, 10), C1 = B1, B1 = T;
+
+            T = ROTATE_LEFT((A2 + F(79 - j, B2, C2, D2) + X[i][R2[j]] + K2(j)), S2[j]) + E2;
+
+            A2 = E2, E2 = D2, D2 = ROTATE_LEFT(C2, 10), C2 = B2, B2 = T;
+
+            if (j == 15) { T = B1; B1 = B2; B2 = T; }
+            if (j == 31) { T = D1; D1 = D2; D2 = T; }
+            if (j == 47) { T = A1; A1 = A2; A2 = T; }
+            if (j == 63) { T = C1; C1 = C2; C2 = T; }
+            if (j == 79) { T = E1; E1 = E2; E2 = T; }
+        }
+
+        H0 = H0 + A1; H1 = H1 + B1; H2 = H2 + C1; H3 = H3 + D1;                             //Обновляем значения
+        H4 = H4 + E1; H5 = H5 + A2; H6 = H6 + B2; H7 = H7 + C2;
+        H8 = H8 + D2; H9 = H9 + E2;
     }
 
-    chunk[(msg_len >> 2) & 15] ^= (uint32_t)1 << (8 * (msg_len & 3) + 7);
+    for (unsigned int i = 0; i < blocks; i++)
+        delete [] X[i];                                                                     //Освобождаем память
 
-    // 55 - because 56 * 8 = 448 which is left border of the chunk
-    if ((msg_len & 63) > 55) {
-//        compress(digest, chunk);
-        memset(chunk, 0, 64);
-    }
-
-    chunk[14] = msg_len << 3;
-    chunk[15] = (msg_len >> 29);
+    delete [] X;
 }
 
-RIPEMD::RIPEMD320::RIPEMD320() {
+string RIPEMD_320::ripemd_320()                                                             //Алгоритм преобразования
+{
+    extension();                                                                            //Добавление дополнительных битов
+    adding_length();                                                                        //Добавление исходной длины сообщения
+    initialize_ripemd();                                                                    //Инициализация буфера
+    message_processing();                                                                   //Основной цикл
 
+    result << hex << inv(H0) << inv(H1) << inv(H2) << inv(H3) << inv(H4)
+                  << inv(H5) << inv(H6) << inv(H7) << inv(H8) << inv(H9);                   //Результат в виде хэш-сообщения
+
+    return result.str();                                                                    //Возвращаем результат в виде хэш-сообщения
 }
