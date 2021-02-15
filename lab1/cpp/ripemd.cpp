@@ -93,20 +93,20 @@ void RIPEMD::RIPEMD_320::add_additional_bits(string &message) {
 }
 
 // Добавление исходной длины сообщения
-uint32_t **RIPEMD::RIPEMD_320::generate_blocks_array(uint32_t blocks, uint64_t bitlen, string &message) {
+uint32_t **RIPEMD::RIPEMD_320::generate_blocks_array(uint32_t blocks_count, uint64_t bitlen, string &message) {
     // X - массив массивов блоков по 64 байта(512 бит)
-    auto **X = new uint32_t *[blocks];
+    auto **X = new uint32_t *[blocks_count];
 
-    for (uint32_t i = 0; i < blocks; i++) {
+    for (uint32_t i = 0; i < blocks_count; i++) {
         X[i] = new uint32_t[16];
 
         // Если это не последний блок, то переносим преобразованное message в X
         // Если блок послений, то делаем то же самое, но оставляем 8 байт под bitlen
-        for (uint32_t j = 0; j < (i == blocks - 1 ? 14 : 16); j++)
+        for (uint32_t j = 0; j < (i == blocks_count - 1 ? 14 : 16); j++)
             X[i][j] = bytes_to_uint(&message[(j * 4) + 64 * i]);
 
         // Если это после дний блок
-        if (i == blocks - 1) {
+        if (i == blocks_count - 1) {
             // добавляются младшие 64 бита, взятые из побитового представления
             // REMOVED & 0xFFFFFFFF
             X[i][14] = bitlen;
@@ -125,21 +125,21 @@ uint32_t *RIPEMD::RIPEMD_320::get_initial_hashes() {
 }
 
 // Обработка сообщения в блоках
-uint32_t *RIPEMD::RIPEMD_320::generate_hashes(uint32_t blocks, uint32_t **bit_msg) {
+uint32_t *RIPEMD::RIPEMD_320::generate_hashes(uint32_t blocks_count, uint32_t **blocks) {
     static uint32_t *hashes = get_initial_hashes();
 
     // Цикл блоков сообщения
-    for (uint32_t i = 0, T; i < blocks; i++) {
+    for (uint32_t i = 0, T; i < blocks_count; i++) {
         uint32_t H[N] = {0};
         memcpy(H, hashes, N * sizeof(uint32_t));
 
         // Магия
         for (uint32_t j = 0; j < 80; j++) {
-            T = rotl((H[0] + F(j, H[1], H[2], H[3]) + bit_msg[i][R1[j]] + K1(j)), S1[j]) + H[4];
+            T = rotl((H[0] + F(j, H[1], H[2], H[3]) + blocks[i][R1[j]] + K1(j)), S1[j]) + H[4];
 
             H[0] = H[4], H[4] = H[3], H[3] = rotl(H[2], N), H[2] = H[1], H[1] = T;
 
-            T = rotl((H[5] + F(79 - j, H[6], H[7], H[8]) + bit_msg[i][R2[j]] + K2(j)), S2[j]) + H[9];
+            T = rotl((H[5] + F(79 - j, H[6], H[7], H[8]) + blocks[i][R2[j]] + K2(j)), S2[j]) + H[9];
 
             H[5] = H[9], H[9] = H[8], H[8] = rotl(H[7], N), H[7] = H[6], H[6] = T;
 
@@ -166,10 +166,9 @@ uint32_t *RIPEMD::RIPEMD_320::generate_hashes(uint32_t blocks, uint32_t **bit_ms
     }
 
     // Освобождаем память
-    for (uint32_t i = 0; i < blocks; i++)
-        delete[] bit_msg[i];
-
-    delete[] bit_msg;
+    for (uint32_t i = 0; i < blocks_count; i++)
+        delete[] blocks[i];
+    delete[] blocks;
 
     return hashes;
 }
@@ -183,13 +182,13 @@ std::string RIPEMD::RIPEMD_320::ripemd_320(string message) {
     add_additional_bits(message);
 
     // Количество блоков для обработки
-    uint32_t blocks = (uint32_t) (message.size() / 64) + 1;
+    uint32_t blocks_count = (uint32_t) (message.size() / 64) + 1;
 
-    // Добавление исходной длины сообщения
-    uint32_t **bit_msg = generate_blocks_array(blocks, bitlen, message);
+    // Генерация массива блоков по 512 бит (добавление исходной длины сообщения)
+    uint32_t **blocks = generate_blocks_array(blocks_count, bitlen, message);
 
     // Основной цикл
-    uint32_t *hashes = generate_hashes(blocks, bit_msg);
+    uint32_t *hashes = generate_hashes(blocks_count, blocks);
 
     // Результат в виде хэш-сообщения
     ostringstream result;

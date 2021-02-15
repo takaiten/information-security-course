@@ -52,11 +52,11 @@ namespace RIPEMD {
 
         static void add_additional_bits(string &message);
 
-        static uint32_t **generate_blocks_array(uint32_t blocks, uint64_t bitlen, string &message);
+        static uint32_t **generate_blocks_array(uint32_t blocks_count, uint64_t bitlen, string &message);
 
         static uint32_t *get_initial_hashes();
 
-        static uint32_t * generate_hashes(uint32_t blocks, uint32_t **bit_msg);
+        static uint32_t *generate_hashes(uint32_t blocks_count, uint32_t **blocks);
 
     public:
         static string ripemd_320(string message);
