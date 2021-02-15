@@ -1,4 +1,5 @@
 #include "ripemd.hpp"
+#include <cstring>
 
 using namespace RIPEMD::helpers;
 
@@ -69,7 +70,7 @@ uint32_t RIPEMD::helpers::inv(uint32_t value) {
 }
 
 // Преобразование 4-х байт в uint32_t
-uint32_t RIPEMD::helpers::bytes_to_uint(char *bytes) {
+uint32_t RIPEMD::helpers::bytes_to_uint(const char *bytes) {
     uint32_t res = 0;
 
     res |= ((uint32_t) bytes[3] << 24) & 0xFF000000;
@@ -80,14 +81,8 @@ uint32_t RIPEMD::helpers::bytes_to_uint(char *bytes) {
     return res;
 }
 
-// Считывание сообщения
-void RIPEMD::RIPEMD_320::read_message(string str) { message = str; }
-
-// Добавление дополнительных битов
-void RIPEMD::RIPEMD_320::extension() {
-    // Исходная длина сообщения в битах
-    bitlen = message.size() * 8;
-
+// Добавляет дополнительных битов
+void RIPEMD::RIPEMD_320::add_additional_bits(string &message) {
     // Добавляем в конец сообщения единичный бит
     message.push_back((uint8_t) 0x80);
 
@@ -95,15 +90,12 @@ void RIPEMD::RIPEMD_320::extension() {
     while ((message.size() * 8) % 512 != 448)
         // Заполняем сообщение нулями
         message.push_back(0);
-
-    // Количество блоков для обработки
-    blocks = (uint32_t) (message.size() / 64) + 1;
 }
 
 // Добавление исходной длины сообщения
-void RIPEMD::RIPEMD_320::adding_length() {
+uint32_t **RIPEMD::RIPEMD_320::generate_blocks_array(uint32_t blocks, uint64_t bitlen, string &message) {
     // X - массив массивов блоков по 64 байта(512 бит)
-    X = new uint32_t *[blocks];
+    auto **X = new uint32_t *[blocks];
 
     for (uint32_t i = 0; i < blocks; i++) {
         X[i] = new uint32_t[16];
@@ -122,42 +114,34 @@ void RIPEMD::RIPEMD_320::adding_length() {
             X[i][15] = bitlen >> 32;
         }
     }
+    return X;
 }
 
 // Инициализация буфера
-void RIPEMD::RIPEMD_320::initialize_ripemd() {
-    H0 = 0x67452301, H1 = 0xEFCDAB89, H2 = 0x98BADCFE, H3 = 0x10325476, H4 = 0xC3D2E1F0;
-    H5 = 0x76543210, H6 = 0xFEDCBA98, H7 = 0x89ABCDEF, H8 = 0x01234567, H9 = 0x3C2D1E0F;
+uint32_t *RIPEMD::RIPEMD_320::get_initial_hashes() {
+    static uint32_t initial_hash[N] = {0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0,
+                                       0x76543210, 0xFEDCBA98, 0x89ABCDEF, 0x01234567, 0x3C2D1E0F};
+    return initial_hash;
 }
 
 // Обработка сообщения в блоках
-void RIPEMD::RIPEMD_320::message_processing() {
-    uint32_t D[10] = {H0, H1, H2, H3, H4, H5, H6, H7, H8, H9};
-    uint32_t T;
+uint32_t *RIPEMD::RIPEMD_320::generate_hashes(uint32_t blocks, uint32_t **bit_msg) {
+    static uint32_t *hashes = get_initial_hashes();
 
     // Цикл блоков сообщения
-    for (uint32_t i = 0; i < blocks; i++) {
-        uint32_t H[10] = {H0, H1, H2, H3, H4, H5, H6, H7, H8, H9};
-//        A1 = H0, B1 = H1, C1 = H2, D1 = H3, E1 = H4;
-//        A2 = H5, B2 = H6, C2 = H7, D2 = H8, E2 = H9;
+    for (uint32_t i = 0, T; i < blocks; i++) {
+        uint32_t H[N] = {0};
+        memcpy(H, hashes, N * sizeof(uint32_t));
 
         // Магия
         for (uint32_t j = 0; j < 80; j++) {
-            T = rotl((H[0] + F(j, H[1], H[2], H[3]) + X[i][R1[j]] + K1(j)), S1[j]) + H[4];
+            T = rotl((H[0] + F(j, H[1], H[2], H[3]) + bit_msg[i][R1[j]] + K1(j)), S1[j]) + H[4];
 
-            H[0] = H[4];
-            H[4] = H[3];
-            H[3] = rotl(H[2], 10);
-            H[2] = H[1];
-            H[1] = T;
+            H[0] = H[4], H[4] = H[3], H[3] = rotl(H[2], N), H[2] = H[1], H[1] = T;
 
-            T = rotl((H[5] + F(79 - j, H[6], H[7], H[8]) + X[i][R2[j]] + K2(j)), S2[j]) + H[9];
+            T = rotl((H[5] + F(79 - j, H[6], H[7], H[8]) + bit_msg[i][R2[j]] + K2(j)), S2[j]) + H[9];
 
-            H[5] = H[9];
-            H[9] = H[8];
-            H[8] = rotl(H[7], 10);
-            H[7] = H[6];
-            H[6] = T;
+            H[5] = H[9], H[9] = H[8], H[8] = rotl(H[7], N), H[7] = H[6], H[6] = T;
 
 #define swap(k)                     \
     {                               \
@@ -167,59 +151,53 @@ void RIPEMD::RIPEMD_320::message_processing() {
     }
 
             switch (j) {
-                case 15: swap(1);
-                    break;
-                case 31: swap(3);
-                    break;
-                case 47: swap(0);
-                    break;
-                case 63: swap(2);
-                    break;
-                case 79: swap(4);
-                    break;
-                default:
-                    break;
+                case 15: swap(1); break;
+                case 31: swap(3); break;
+                case 47: swap(0); break;
+                case 63: swap(2); break;
+                case 79: swap(4); break;
+                default: break;
             }
-
-
-            // Обновляем значения
-            for (int k = 0; k < 10; k++) {
-                D[k] += H[k];
-            }
-//        H0 = H0 + A1;
-//        H1 = H1 + B1;
-//        H2 = H2 + C1;
-//        H3 = H3 + D1;
-//        H4 = H4 + E1;
-//        H5 = H5 + A2;
-//        H6 = H6 + B2;
-//        H7 = H7 + C2;
-//        H8 = H8 + D2;
-//        H9 = H9 + E2;
+        }
+        // Обновляем значения
+        for (int k = 0; k < N; k++) {
+            hashes[k] += H[k];
         }
     }
 
     // Освобождаем память
     for (uint32_t i = 0; i < blocks; i++)
-        delete[] X[i];
+        delete[] bit_msg[i];
 
-    delete[] X;
+    delete[] bit_msg;
+
+    return hashes;
 }
 
 // Алгоритм преобразования
-std::string RIPEMD::RIPEMD_320::ripemd_320() {
+std::string RIPEMD::RIPEMD_320::ripemd_320(string message) {
+    // Размер сообщения в битах
+    uint64_t bitlen = message.size() * 8;
+
     // Добавление дополнительных битов
-    extension();
+    add_additional_bits(message);
+
+    // Количество блоков для обработки
+    uint32_t blocks = (uint32_t) (message.size() / 64) + 1;
+
     // Добавление исходной длины сообщения
-    adding_length();
-    // Инициализация буфера
-    initialize_ripemd();
+    uint32_t **bit_msg = generate_blocks_array(blocks, bitlen, message);
+
     // Основной цикл
-    message_processing();
+    uint32_t *hashes = generate_hashes(blocks, bit_msg);
 
     // Результат в виде хэш-сообщения
-    result << hex << inv(H0) << inv(H1) << inv(H2) << inv(H3) << inv(H4)
-           << inv(H5) << inv(H6) << inv(H7) << inv(H8) << inv(H9);
+    ostringstream result;
+
+    result << hex;
+    for (size_t i = 0; i < N; i++) {
+        result << inv(hashes[i]);
+    }
 
     return result.str();
 }
