@@ -1,88 +1,16 @@
+#include <sstream>
+#include <string.h>
+
 #include "ripemd.hpp"
-#include <cstring>
+#include "helpers.hpp"
+#include "const.hpp"
 
-using namespace RIPEMD::helpers;
+const uint32_t N = 10;
 
-// Нелинейная побитовая функция F
-uint32_t RIPEMD::helpers::F(uint32_t j, uint32_t x, uint32_t y, uint32_t z) {
-    switch (j) {
-        case 0 ... 15:
-            return x ^ y ^ z;
-        case 16 ... 31:
-            return (x & y) | (~x & z);
-        case 32 ... 47:
-            return (x | ~y) ^ z;
-        case 48 ... 63:
-            return (x & z) | (y & ~z);
-        case 64 ... 79:
-            return x ^ (y | ~z);
-        default:
-            throw invalid_argument("Helpers::f: j must be in range from 0 to 70");
-    }
-}
-
-// Добавляемые 16-ичные константы
-uint32_t RIPEMD::helpers::K1(uint32_t j) {
-    switch (j) {
-        case 0 ... 15:
-            return 0x00000000;
-        case 16 ... 31:
-            return 0x5A827999;
-        case 32 ... 47:
-            return 0x6ED9EBA1;
-        case 48 ... 63:
-            return 0x8F1BBCDC;
-        case 64 ... 79:
-            return 0xA953FD4E;
-        default:
-            throw invalid_argument("Helpers::K1: j must be in range from 0 to 70");
-    }
-}
-
-// Добавляемые 16-ичные константы
-uint32_t RIPEMD::helpers::K2(uint32_t j) {
-    switch (j) {
-        case 0 ... 15:
-            return 0x50A28BE6;
-        case 16 ... 31:
-            return 0x5C4DD124;
-        case 32 ... 47:
-            return 0x6D703EF3;
-        case 48 ... 63:
-            return 0x7A6D76E9;
-        case 64 ... 79:
-            return 0x00000000;
-        default:
-            throw invalid_argument("Helpers::K2: j must be in range from 0 to 70");
-    }
-}
-
-// Смена порядка бит
-uint32_t RIPEMD::helpers::inv(uint32_t value) {
-    uint32_t res = 0;
-
-    res |= ((value >> 0) & 0xFF) << 24;
-    res |= ((value >> 8) & 0xFF) << 16;
-    res |= ((value >> 16) & 0xFF) << 8;
-    res |= ((value >> 24) & 0xFF) << 0;
-
-    return res;
-}
-
-// Преобразование 4-х байт в uint32_t
-uint32_t RIPEMD::helpers::bytes_to_uint(const char *bytes) {
-    uint32_t res = 0;
-
-    res |= ((uint32_t) bytes[3] << 24) & 0xFF000000;
-    res |= ((uint32_t) bytes[2] << 16) & 0xFF0000;
-    res |= ((uint32_t) bytes[1] << 8) & 0xFF00;
-    res |= ((uint32_t) bytes[0] << 0) & 0xFF;
-
-    return res;
-}
+#define ROTL(x, n) (((x) << (n)) | ((x) >> (32-(n))))
 
 // Добавляет дополнительных битов
-void RIPEMD::RIPEMD_320::add_additional_bits(string &message) {
+void methods::add_additional_bits(std::string &message) {
     // Добавляем в конец сообщения единичный бит
     message.push_back((uint8_t) 0x80);
 
@@ -93,7 +21,7 @@ void RIPEMD::RIPEMD_320::add_additional_bits(string &message) {
 }
 
 // Добавление исходной длины сообщения
-uint32_t **RIPEMD::RIPEMD_320::generate_blocks_array(uint32_t blocks_count, uint64_t bitlen, string &message) {
+uint32_t **methods::generate_blocks_array(uint32_t blocks_count, uint64_t bitlen, std::string &message) {
     // X - массив массивов блоков по 64 байта(512 бит)
     auto **X = new uint32_t *[blocks_count];
 
@@ -117,16 +45,12 @@ uint32_t **RIPEMD::RIPEMD_320::generate_blocks_array(uint32_t blocks_count, uint
     return X;
 }
 
-// Инициализация буфера
-uint32_t *RIPEMD::RIPEMD_320::get_initial_hashes() {
-    static uint32_t initial_hash[N] = {0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0,
-                                       0x76543210, 0xFEDCBA98, 0x89ABCDEF, 0x01234567, 0x3C2D1E0F};
-    return initial_hash;
-}
-
 // Обработка сообщения в блоках
-uint32_t *RIPEMD::RIPEMD_320::generate_hashes(uint32_t blocks_count, uint32_t **blocks) {
-    static uint32_t *hashes = get_initial_hashes();
+uint32_t *methods::generate_hashes(uint32_t blocks_count, uint32_t **blocks) {
+    // Инициализация буфера
+    static uint32_t hashes[N] = {0};
+    memcpy(hashes, initial_hashes, N * sizeof(uint32_t));
+
 
     // Цикл блоков сообщения
     for (uint32_t i = 0, T; i < blocks_count; i++) {
@@ -135,13 +59,13 @@ uint32_t *RIPEMD::RIPEMD_320::generate_hashes(uint32_t blocks_count, uint32_t **
 
         // Магия
         for (uint32_t j = 0; j < 80; j++) {
-            T = rotl((H[0] + F(j, H[1], H[2], H[3]) + blocks[i][R1[j]] + K1(j)), S1[j]) + H[4];
+            T = ROTL((H[0] + F(j, H[1], H[2], H[3]) + blocks[i][R1[j]] + K1(j)), S1[j]) + H[4];
 
-            H[0] = H[4], H[4] = H[3], H[3] = rotl(H[2], N), H[2] = H[1], H[1] = T;
+            H[0] = H[4], H[4] = H[3], H[3] = ROTL(H[2], N), H[2] = H[1], H[1] = T;
 
-            T = rotl((H[5] + F(79 - j, H[6], H[7], H[8]) + blocks[i][R2[j]] + K2(j)), S2[j]) + H[9];
+            T = ROTL((H[5] + F(79 - j, H[6], H[7], H[8]) + blocks[i][R2[j]] + K2(j)), S2[j]) + H[9];
 
-            H[5] = H[9], H[9] = H[8], H[8] = rotl(H[7], N), H[7] = H[6], H[6] = T;
+            H[5] = H[9], H[9] = H[8], H[8] = ROTL(H[7], N), H[7] = H[6], H[6] = T;
 
 #define swap(k)                     \
     {                               \
@@ -174,7 +98,9 @@ uint32_t *RIPEMD::RIPEMD_320::generate_hashes(uint32_t blocks_count, uint32_t **
 }
 
 // Алгоритм преобразования
-std::string RIPEMD::RIPEMD_320::ripemd_320(string message) {
+std::string ripemd320(std::string message) {
+    using namespace methods;
+    
     // Размер сообщения в битах
     uint64_t bitlen = message.size() * 8;
 
@@ -191,9 +117,9 @@ std::string RIPEMD::RIPEMD_320::ripemd_320(string message) {
     uint32_t *hashes = generate_hashes(blocks_count, blocks);
 
     // Результат в виде хэш-сообщения
-    ostringstream result;
+    std::ostringstream result;
 
-    result << hex;
+    result << std::hex;
     for (size_t i = 0; i < N; i++) {
         result << inv(hashes[i]);
     }
