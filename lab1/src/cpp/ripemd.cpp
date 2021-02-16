@@ -45,6 +45,30 @@ uint32_t **methods::generate_blocks_array(uint32_t blocks_count, uint64_t bitlen
     return X;
 }
 
+void methods::change_bit(uint32_t **blocks, uint64_t bit_pos) {
+    // индекс строки
+    uint32_t row = bit_pos >> 9;
+
+    // индекс бита в строке
+    uint32_t bit_index_in_row = bit_pos % 512;
+
+    // индекс uint32_t (4 байта) в blocks[row]
+    uint32_t column = bit_index_in_row >> 5;
+
+    // индекс бита в blocks[row][column]
+    uint32_t bit_index_in_4bytes = bit_index_in_row % 32;
+
+    // blocks[row][column] xor pow(2, 31 - bit_index_in_4bytes)
+    blocks[row][column] ^= 1 << (31 - bit_index_in_4bytes);
+
+    /* пример для 8 бит:
+     * p = 1111 1111, нужно поменять 2-й слева бит (отсчет с нуля)
+     * делаем xor с числом a == 0010 0000
+     * a == 1 << (7 - 2) == 1 << 5 == 0000 0001 << 5 == 0010 0000
+     * p xor a == 1101 1111
+     * => поменяли ровно 2-й слева бит */
+}
+
 // Обработка сообщения в блоках
 uint32_t *methods::generate_hashes(uint32_t blocks_count, uint32_t **blocks) {
     // Инициализация буфера
@@ -98,7 +122,7 @@ uint32_t *methods::generate_hashes(uint32_t blocks_count, uint32_t **blocks) {
 }
 
 // Алгоритм преобразования
-std::string ripemd320(std::string message) {
+std::string ripemd320(std::string message, uint64_t bit_pos = -1) {
     using namespace methods;
     
     // Размер сообщения в битах
@@ -112,6 +136,10 @@ std::string ripemd320(std::string message) {
 
     // Генерация массива блоков по 512 бит (добавление исходной длины сообщения)
     uint32_t **blocks = generate_blocks_array(blocks_count, bitlen, message);
+
+    if (bit_pos >= 0 && bit_pos < bitlen) {
+        change_bit(blocks, bit_pos);
+    }
 
     // Основной цикл
     uint32_t *hashes = generate_hashes(blocks_count, blocks);
