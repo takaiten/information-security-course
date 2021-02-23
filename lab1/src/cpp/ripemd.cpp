@@ -122,7 +122,7 @@ uint32_t *methods::generate_hashes(uint32_t blocks_count, uint32_t **blocks) {
 }
 
 // Алгоритм преобразования
-std::string ripemd320(std::string message, uint64_t bit_pos = -1) {
+std::string ripemd320(std::string message) {
     using namespace methods;
     
     // Размер сообщения в битах
@@ -137,7 +137,36 @@ std::string ripemd320(std::string message, uint64_t bit_pos = -1) {
     // Генерация массива блоков по 512 бит (добавление исходной длины сообщения)
     uint32_t **blocks = generate_blocks_array(blocks_count, bitlen, message);
 
-    if (bit_pos >= 0 && bit_pos < bitlen) {
+    // Основной цикл
+    uint32_t *hashes = generate_hashes(blocks_count, blocks);
+
+    // Результат в виде хэш-сообщения
+    std::ostringstream result;
+
+    result << std::hex;
+    for (size_t i = 0; i < N; i++) {
+        result << inv(hashes[i]);
+    }
+
+    return result.str();
+}
+
+std::string ripemd320_with_bit_change(std::string message, uint64_t bit_pos) {
+    using namespace methods;
+
+    // Размер сообщения в битах
+    uint64_t bitlen = message.size() * 8;
+
+    // Добавление дополнительных битов
+    add_additional_bits(message);
+
+    // Количество блоков для обработки
+    uint32_t blocks_count = (uint32_t) (message.size() / 64) + 1;
+
+    // Генерация массива блоков по 512 бит (добавление исходной длины сообщения)
+    uint32_t **blocks = generate_blocks_array(blocks_count, bitlen, message);
+
+    if (bit_pos < bitlen) {
         change_bit(blocks, bit_pos);
     }
 

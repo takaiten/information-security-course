@@ -7,4 +7,5 @@ namespace methods {
     void change_bit(uint32_t **blocks, uint64_t  bit_pos);
 }
 
-std::string ripemd320(std::string message, uint64_t bit_pos);
+std::string ripemd320(std::string message);
+std::string ripemd320_with_bit_change(std::string message, uint64_t bit_pos);
