@@ -5,6 +5,7 @@ from Cython.Build import cythonize
 # setuptools.setup calls it automatically if Cython is installed
 setup(
     name='ripemd',
+    py_modules=['RIPEMD'],
     ext_modules=cythonize(
         Extension(
             'RIPEMD',

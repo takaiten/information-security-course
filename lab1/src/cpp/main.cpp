@@ -2,9 +2,9 @@
 #include <iostream>
 
 int main() {
-    std::string msg = ripemd320("examples examples examples examples examples examples examples examples", 32);
+    auto result = ripemd320_with_bit_change("examples", 2);
 
-    std::cout << msg;
+    std::cout << result.first;
 
     return 0;
 }

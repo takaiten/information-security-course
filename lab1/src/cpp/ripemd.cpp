@@ -1,5 +1,8 @@
 #include <sstream>
 #include <string.h>
+#include <bitset>
+#include <vector>
+#include <tuple>
 
 #include "ripemd.hpp"
 #include "helpers.hpp"
@@ -70,11 +73,11 @@ void methods::change_bit(uint32_t **blocks, uint64_t bit_pos) {
 }
 
 // Обработка сообщения в блоках
-uint32_t *methods::generate_hashes(uint32_t blocks_count, uint32_t **blocks) {
+std::pair<uint32_t*, std::vector<uint32_t>> methods::generate_hashes(uint32_t blocks_count, uint32_t **blocks) {
     // Инициализация буфера
     static uint32_t hashes[N] = {0};
     memcpy(hashes, initial_hashes, N * sizeof(uint32_t));
-
+    std::vector<uint32_t> changed_bits_count(blocks_count, 0);
 
     // Цикл блоков сообщения
     for (uint32_t i = 0, T; i < blocks_count; i++) {
@@ -109,7 +112,9 @@ uint32_t *methods::generate_hashes(uint32_t blocks_count, uint32_t **blocks) {
         }
         // Обновляем значения
         for (int k = 0; k < N; k++) {
+            std::bitset<32> bits(hashes[k]);
             hashes[k] += H[k];
+            changed_bits_count[i] += (bits ^ std::bitset<32>(hashes[k])).count();
         }
     }
 
@@ -118,7 +123,7 @@ uint32_t *methods::generate_hashes(uint32_t blocks_count, uint32_t **blocks) {
         delete[] blocks[i];
     delete[] blocks;
 
-    return hashes;
+    return std::make_pair(hashes, changed_bits_count);
 }
 
 // Алгоритм преобразования
@@ -138,7 +143,7 @@ std::string ripemd320(std::string message) {
     uint32_t **blocks = generate_blocks_array(blocks_count, bitlen, message);
 
     // Основной цикл
-    uint32_t *hashes = generate_hashes(blocks_count, blocks);
+    uint32_t *hashes = generate_hashes(blocks_count, blocks).first;
 
     // Результат в виде хэш-сообщения
     std::ostringstream result;
@@ -151,7 +156,7 @@ std::string ripemd320(std::string message) {
     return result.str();
 }
 
-std::string ripemd320_with_bit_change(std::string message, uint64_t bit_pos) {
+std::pair<std::string, std::vector<uint32_t>> ripemd320_with_bit_change(std::string message, uint64_t bit_pos) {
     using namespace methods;
 
     // Размер сообщения в битах
@@ -171,15 +176,15 @@ std::string ripemd320_with_bit_change(std::string message, uint64_t bit_pos) {
     }
 
     // Основной цикл
-    uint32_t *hashes = generate_hashes(blocks_count, blocks);
+    auto pair = generate_hashes(blocks_count, blocks);
 
     // Результат в виде хэш-сообщения
     std::ostringstream result;
 
     result << std::hex;
     for (size_t i = 0; i < N; i++) {
-        result << inv(hashes[i]);
+        result << inv(pair.first[i]);
     }
 
-    return result.str();
+    return std::make_pair(result.str(), pair.second);
 }
