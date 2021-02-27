@@ -77,7 +77,7 @@ std::pair<uint32_t*, std::vector<uint32_t>> methods::generate_hashes(uint32_t bl
     // Инициализация буфера
     static uint32_t hashes[N] = {0};
     memcpy(hashes, initial_hashes, N * sizeof(uint32_t));
-    std::vector<uint32_t> changed_bits_count(blocks_count, 0);
+    std::vector<uint32_t> changed_bits_count(80 * blocks_count, 0);
 
     // Цикл блоков сообщения
     for (uint32_t i = 0, T; i < blocks_count; i++) {
@@ -86,6 +86,9 @@ std::pair<uint32_t*, std::vector<uint32_t>> methods::generate_hashes(uint32_t bl
 
         // Магия
         for (uint32_t j = 0; j < 80; j++) {
+            uint32_t H_before[N] = {0};
+            memcpy(H_before, H, N * sizeof(uint32_t));
+
             T = ROTL((H[0] + F(j, H[1], H[2], H[3]) + blocks[i][R1[j]] + K1(j)), S1[j]) + H[4];
 
             H[0] = H[4], H[4] = H[3], H[3] = ROTL(H[2], N), H[2] = H[1], H[1] = T;
@@ -109,12 +112,17 @@ std::pair<uint32_t*, std::vector<uint32_t>> methods::generate_hashes(uint32_t bl
                 case 79: swap(4); break;
                 default: break;
             }
+
+            for (int k = 0; k < N; k++) {
+                std::bitset<32> before(H_before[k]);
+                std::bitset<32> after(H[k]);
+
+                changed_bits_count[i * blocks_count + j] += (before ^ after).count();
+            }
         }
         // Обновляем значения
         for (int k = 0; k < N; k++) {
-            std::bitset<32> bits(hashes[k]);
             hashes[k] += H[k];
-            changed_bits_count[i] += (bits ^ std::bitset<32>(hashes[k])).count();
         }
     }
 
