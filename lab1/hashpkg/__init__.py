@@ -1,1 +1,1 @@
-from ripemd320 import *
+from .ripemd320 import *
