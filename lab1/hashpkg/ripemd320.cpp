@@ -4,17 +4,20 @@
 {
     "distutils": {
         "depends": [
-            "../../cpp/ripemd.hpp"
+            "ripemd.hpp"
+        ],
+        "include_dirs": [
+            "."
         ],
         "language": "c++",
-        "name": "RIPEMD",
+        "name": "hashpkg.ripemd320",
         "sources": [
             "ripemd320.pyx",
-            "../../cpp/ripemd.cpp",
-            "../../cpp/helpers.cpp"
+            "ripemd.cpp",
+            "helpers.cpp"
         ]
     },
-    "module_name": "RIPEMD"
+    "module_name": "hashpkg.ripemd320"
 }
 END: Cython Metadata */
 
@@ -27,7 +30,7 @@ END: Cython Metadata */
 #else
 #define CYTHON_ABI "0_29_21"
 #define CYTHON_HEX_VERSION 0x001D15F0
-#define CYTHON_FUTURE_DIVISION 0
+#define CYTHON_FUTURE_DIVISION 1
 #include <stddef.h>
 #ifndef offsetof
   #define offsetof(type, member) ( (size_t) & ((type*)0) -> member )
@@ -634,8 +637,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__RIPEMD
-#define __PYX_HAVE_API__RIPEMD
+#define __PYX_HAVE__hashpkg__ripemd320
+#define __PYX_HAVE_API__hashpkg__ripemd320
 /* Early includes */
 #include <string.h>
 #include "ios"
@@ -657,7 +660,7 @@ static CYTHON_INLINE float __PYX_NAN() {
     #endif
     
 #include <stdint.h>
-#include "../../cpp/ripemd.hpp"
+#include "ripemd.hpp"
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -954,37 +957,6 @@ static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
         __Pyx__ArgTypeTest(obj, type, name, exact))
 static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *name, int exact);
 
-/* PyObjectCall.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
-#else
-#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
-#endif
-
-/* PyObjectGetAttrStr.proto */
-#if CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject* attr_name);
-#else
-#define __Pyx_PyObject_GetAttrStr(o,n) PyObject_GetAttr(o,n)
-#endif
-
-/* UnpackUnboundCMethod.proto */
-typedef struct {
-    PyObject *type;
-    PyObject **method_name;
-    PyCFunction func;
-    PyObject *method;
-    int flag;
-} __Pyx_CachedCFunction;
-
-/* CallUnboundCMethod1.proto */
-static PyObject* __Pyx__CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg);
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg);
-#else
-#define __Pyx_CallUnboundCMethod1(cfunc, self, arg)  __Pyx__CallUnboundCMethod1(cfunc, self, arg)
-#endif
-
 /* IncludeCppStringH.proto */
 #include <string>
 
@@ -1016,6 +988,13 @@ static CYTHON_INLINE PyObject* __Pyx_decode_cpp_string(
     return __Pyx_decode_c_bytes(
         cppstring.data(), cppstring.size(), start, stop, encoding, errors, decode_func);
 }
+
+/* PyObjectGetAttrStr.proto */
+#if CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject* attr_name);
+#else
+#define __Pyx_PyObject_GetAttrStr(o,n) PyObject_GetAttr(o,n)
+#endif
 
 /* GetBuiltinName.proto */
 static PyObject *__Pyx_GetBuiltinName(PyObject *name);
@@ -1175,7 +1154,9 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 /* Module declarations from 'libc.stdint' */
 
-/* Module declarations from 'RIPEMD' */
+/* Module declarations from 'ripemd320' */
+
+/* Module declarations from 'hashpkg.ripemd320' */
 static std::string __pyx_convert_string_from_py_std__in_string(PyObject *); /*proto*/
 static CYTHON_INLINE PyObject *__pyx_convert_PyObject_string_to_py_std__in_string(std::string const &); /*proto*/
 static CYTHON_INLINE PyObject *__pyx_convert_PyUnicode_string_to_py_std__in_string(std::string const &); /*proto*/
@@ -1183,63 +1164,58 @@ static CYTHON_INLINE PyObject *__pyx_convert_PyStr_string_to_py_std__in_string(s
 static CYTHON_INLINE PyObject *__pyx_convert_PyBytes_string_to_py_std__in_string(std::string const &); /*proto*/
 static CYTHON_INLINE PyObject *__pyx_convert_PyByteArray_string_to_py_std__in_string(std::string const &); /*proto*/
 static PyObject *__pyx_convert_vector_to_py_uint32_t(const std::vector<uint32_t>  &); /*proto*/
-#define __Pyx_MODULE_NAME "RIPEMD"
-extern int __pyx_module_is_main_RIPEMD;
-int __pyx_module_is_main_RIPEMD = 0;
+#define __Pyx_MODULE_NAME "hashpkg.ripemd320"
+extern int __pyx_module_is_main_hashpkg__ripemd320;
+int __pyx_module_is_main_hashpkg__ripemd320 = 0;
 
-/* Implementation of 'RIPEMD' */
+/* Implementation of 'hashpkg.ripemd320' */
 static PyObject *__pyx_builtin_range;
 static const char __pyx_k_res[] = "res";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_test[] = "__test__";
-static const char __pyx_k_ascii[] = "ascii";
 static const char __pyx_k_range[] = "range";
-static const char __pyx_k_RIPEMD[] = "RIPEMD";
-static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_bit_pos[] = "bit_pos";
 static const char __pyx_k_message[] = "message";
 static const char __pyx_k_msg_str[] = "msg_str";
 static const char __pyx_k_py_ripemd320[] = "py_ripemd320";
 static const char __pyx_k_ripemd320_pyx[] = "ripemd320.pyx";
-static const char __pyx_k_py_ripemd320_2[] = "py_ripemd320__";
+static const char __pyx_k_hashpkg_ripemd320[] = "hashpkg.ripemd320";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
-static PyObject *__pyx_n_s_RIPEMD;
-static PyObject *__pyx_n_s_ascii;
+static const char __pyx_k_py_ripemd320_with_shift[] = "py_ripemd320_with_shift";
 static PyObject *__pyx_n_s_bit_pos;
 static PyObject *__pyx_n_s_cline_in_traceback;
-static PyObject *__pyx_n_s_encode;
+static PyObject *__pyx_n_s_hashpkg_ripemd320;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_message;
 static PyObject *__pyx_n_s_msg_str;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_py_ripemd320;
-static PyObject *__pyx_n_s_py_ripemd320_2;
+static PyObject *__pyx_n_s_py_ripemd320_with_shift;
 static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_res;
 static PyObject *__pyx_kp_s_ripemd320_pyx;
 static PyObject *__pyx_n_s_test;
-static PyObject *__pyx_pf_6RIPEMD_py_ripemd320(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_message, PyObject *__pyx_v_bit_pos); /* proto */
-static PyObject *__pyx_pf_6RIPEMD_2py_ripemd320__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_message); /* proto */
-static __Pyx_CachedCFunction __pyx_umethod_PyString_Type_encode = {0, &__pyx_n_s_encode, 0, 0, 0};
+static PyObject *__pyx_pf_7hashpkg_9ripemd320_py_ripemd320_with_shift(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_message, PyObject *__pyx_v_bit_pos); /* proto */
+static PyObject *__pyx_pf_7hashpkg_9ripemd320_2py_ripemd320(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_message); /* proto */
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__3;
 static PyObject *__pyx_codeobj__2;
 static PyObject *__pyx_codeobj__4;
 /* Late includes */
 
-/* "ripemd320.pyx":14
+/* "hashpkg/ripemd320.pyx":6
+ * from ripemd320 cimport ripemd320_with_bit_change, ripemd320
  * 
- * 
- * def py_ripemd320(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
+ * def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6RIPEMD_1py_ripemd320(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_6RIPEMD_1py_ripemd320 = {"py_ripemd320", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6RIPEMD_1py_ripemd320, METH_VARARGS|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_6RIPEMD_1py_ripemd320(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7hashpkg_9ripemd320_1py_ripemd320_with_shift(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyMethodDef __pyx_mdef_7hashpkg_9ripemd320_1py_ripemd320_with_shift = {"py_ripemd320_with_shift", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_7hashpkg_9ripemd320_1py_ripemd320_with_shift, METH_VARARGS|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_7hashpkg_9ripemd320_1py_ripemd320_with_shift(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_message = 0;
   PyObject *__pyx_v_bit_pos = 0;
   int __pyx_lineno = 0;
@@ -1247,7 +1223,7 @@ static PyObject *__pyx_pw_6RIPEMD_1py_ripemd320(PyObject *__pyx_self, PyObject *
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("py_ripemd320 (wrapper)", 0);
+  __Pyx_RefNannySetupContext("py_ripemd320_with_shift (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_message,&__pyx_n_s_bit_pos,0};
     PyObject* values[2] = {0,0};
@@ -1271,11 +1247,11 @@ static PyObject *__pyx_pw_6RIPEMD_1py_ripemd320(PyObject *__pyx_self, PyObject *
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_bit_pos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("py_ripemd320", 1, 2, 2, 1); __PYX_ERR(0, 14, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("py_ripemd320_with_shift", 1, 2, 2, 1); __PYX_ERR(0, 6, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "py_ripemd320") < 0)) __PYX_ERR(0, 14, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "py_ripemd320_with_shift") < 0)) __PYX_ERR(0, 6, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -1288,14 +1264,14 @@ static PyObject *__pyx_pw_6RIPEMD_1py_ripemd320(PyObject *__pyx_self, PyObject *
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("py_ripemd320", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 14, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("py_ripemd320_with_shift", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 6, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("RIPEMD.py_ripemd320", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("hashpkg.ripemd320.py_ripemd320_with_shift", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_message), (&PyString_Type), 1, "message", 1))) __PYX_ERR(0, 14, __pyx_L1_error)
-  __pyx_r = __pyx_pf_6RIPEMD_py_ripemd320(__pyx_self, __pyx_v_message, __pyx_v_bit_pos);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_message), (&PyUnicode_Type), 1, "message", 1))) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7hashpkg_9ripemd320_py_ripemd320_with_shift(__pyx_self, __pyx_v_message, __pyx_v_bit_pos);
 
   /* function exit code */
   goto __pyx_L0;
@@ -1306,7 +1282,7 @@ static PyObject *__pyx_pw_6RIPEMD_1py_ripemd320(PyObject *__pyx_self, PyObject *
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6RIPEMD_py_ripemd320(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_message, PyObject *__pyx_v_bit_pos) {
+static PyObject *__pyx_pf_7hashpkg_9ripemd320_py_ripemd320_with_shift(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_message, PyObject *__pyx_v_bit_pos) {
   std::string __pyx_v_msg_str;
   std::pair<std::string,std::vector<uint32_t> >  __pyx_v_res;
   PyObject *__pyx_r = NULL;
@@ -1319,44 +1295,48 @@ static PyObject *__pyx_pf_6RIPEMD_py_ripemd320(CYTHON_UNUSED PyObject *__pyx_sel
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("py_ripemd320", 0);
+  __Pyx_RefNannySetupContext("py_ripemd320_with_shift", 0);
 
-  /* "ripemd320.pyx":15
+  /* "hashpkg/ripemd320.pyx":7
  * 
- * def py_ripemd320(message: str, bit_pos: int) -> tuple:
+ * def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:
  *     cdef string msg_str = message.encode('ascii')             # <<<<<<<<<<<<<<
  * 
  *     cdef pair[string, vector[uint32_t]] res = ripemd320_with_bit_change(msg_str, bit_pos)
  */
-  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyString_Type_encode, __pyx_v_message, __pyx_n_s_ascii); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
+  if (unlikely(__pyx_v_message == Py_None)) {
+    PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
+    __PYX_ERR(0, 7, __pyx_L1_error)
+  }
+  __pyx_t_1 = PyUnicode_AsASCIIString(__pyx_v_message); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_msg_str = __pyx_t_2;
 
-  /* "ripemd320.pyx":17
+  /* "hashpkg/ripemd320.pyx":9
  *     cdef string msg_str = message.encode('ascii')
  * 
  *     cdef pair[string, vector[uint32_t]] res = ripemd320_with_bit_change(msg_str, bit_pos)             # <<<<<<<<<<<<<<
  * 
  *     return res.first.decode('ascii'), res.second
  */
-  __pyx_t_3 = __Pyx_PyInt_As_uint64_t(__pyx_v_bit_pos); if (unlikely((__pyx_t_3 == ((uint64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_uint64_t(__pyx_v_bit_pos); if (unlikely((__pyx_t_3 == ((uint64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 9, __pyx_L1_error)
   __pyx_v_res = ripemd320_with_bit_change(__pyx_v_msg_str, __pyx_t_3);
 
-  /* "ripemd320.pyx":19
+  /* "hashpkg/ripemd320.pyx":11
  *     cdef pair[string, vector[uint32_t]] res = ripemd320_with_bit_change(msg_str, bit_pos)
  * 
  *     return res.first.decode('ascii'), res.second             # <<<<<<<<<<<<<<
  * 
- * 
+ * def py_ripemd320(message: str) -> str:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_decode_cpp_string(__pyx_v_res.first, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_decode_cpp_string(__pyx_v_res.first, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __pyx_convert_vector_to_py_uint32_t(__pyx_v_res.second); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_t_4 = __pyx_convert_vector_to_py_uint32_t(__pyx_v_res.second); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -1368,10 +1348,10 @@ static PyObject *__pyx_pf_6RIPEMD_py_ripemd320(CYTHON_UNUSED PyObject *__pyx_sel
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "ripemd320.pyx":14
+  /* "hashpkg/ripemd320.pyx":6
+ * from ripemd320 cimport ripemd320_with_bit_change, ripemd320
  * 
- * 
- * def py_ripemd320(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
+ * def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
  */
@@ -1381,7 +1361,7 @@ static PyObject *__pyx_pf_6RIPEMD_py_ripemd320(CYTHON_UNUSED PyObject *__pyx_sel
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_AddTraceback("RIPEMD.py_ripemd320", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("hashpkg.ripemd320.py_ripemd320_with_shift", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1389,26 +1369,26 @@ static PyObject *__pyx_pf_6RIPEMD_py_ripemd320(CYTHON_UNUSED PyObject *__pyx_sel
   return __pyx_r;
 }
 
-/* "ripemd320.pyx":22
+/* "hashpkg/ripemd320.pyx":13
+ *     return res.first.decode('ascii'), res.second
  * 
- * 
- * def py_ripemd320__(message: str) -> str:             # <<<<<<<<<<<<<<
+ * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  *     return ripemd320(msg_str).decode('ascii')
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6RIPEMD_3py_ripemd320__(PyObject *__pyx_self, PyObject *__pyx_v_message); /*proto*/
-static PyMethodDef __pyx_mdef_6RIPEMD_3py_ripemd320__ = {"py_ripemd320__", (PyCFunction)__pyx_pw_6RIPEMD_3py_ripemd320__, METH_O, 0};
-static PyObject *__pyx_pw_6RIPEMD_3py_ripemd320__(PyObject *__pyx_self, PyObject *__pyx_v_message) {
+static PyObject *__pyx_pw_7hashpkg_9ripemd320_3py_ripemd320(PyObject *__pyx_self, PyObject *__pyx_v_message); /*proto*/
+static PyMethodDef __pyx_mdef_7hashpkg_9ripemd320_3py_ripemd320 = {"py_ripemd320", (PyCFunction)__pyx_pw_7hashpkg_9ripemd320_3py_ripemd320, METH_O, 0};
+static PyObject *__pyx_pw_7hashpkg_9ripemd320_3py_ripemd320(PyObject *__pyx_self, PyObject *__pyx_v_message) {
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("py_ripemd320__ (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_message), (&PyString_Type), 1, "message", 1))) __PYX_ERR(0, 22, __pyx_L1_error)
-  __pyx_r = __pyx_pf_6RIPEMD_2py_ripemd320__(__pyx_self, ((PyObject*)__pyx_v_message));
+  __Pyx_RefNannySetupContext("py_ripemd320 (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_message), (&PyUnicode_Type), 1, "message", 1))) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_r = __pyx_pf_7hashpkg_9ripemd320_2py_ripemd320(__pyx_self, ((PyObject*)__pyx_v_message));
 
   /* function exit code */
   goto __pyx_L0;
@@ -1419,7 +1399,7 @@ static PyObject *__pyx_pw_6RIPEMD_3py_ripemd320__(PyObject *__pyx_self, PyObject
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6RIPEMD_2py_ripemd320__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_message) {
+static PyObject *__pyx_pf_7hashpkg_9ripemd320_2py_ripemd320(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_message) {
   std::string __pyx_v_msg_str;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -1428,37 +1408,40 @@ static PyObject *__pyx_pf_6RIPEMD_2py_ripemd320__(CYTHON_UNUSED PyObject *__pyx_
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("py_ripemd320__", 0);
+  __Pyx_RefNannySetupContext("py_ripemd320", 0);
 
-  /* "ripemd320.pyx":23
+  /* "hashpkg/ripemd320.pyx":14
  * 
- * def py_ripemd320__(message: str) -> str:
+ * def py_ripemd320(message: str) -> str:
  *     cdef string msg_str = message.encode('ascii')             # <<<<<<<<<<<<<<
  *     return ripemd320(msg_str).decode('ascii')
  */
-  __pyx_t_1 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyString_Type_encode, __pyx_v_message, __pyx_n_s_ascii); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 23, __pyx_L1_error)
+  if (unlikely(__pyx_v_message == Py_None)) {
+    PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
+    __PYX_ERR(0, 14, __pyx_L1_error)
+  }
+  __pyx_t_1 = PyUnicode_AsASCIIString(__pyx_v_message); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_msg_str = __pyx_t_2;
 
-  /* "ripemd320.pyx":24
- * def py_ripemd320__(message: str) -> str:
+  /* "hashpkg/ripemd320.pyx":15
+ * def py_ripemd320(message: str) -> str:
  *     cdef string msg_str = message.encode('ascii')
  *     return ripemd320(msg_str).decode('ascii')             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_decode_cpp_string(ripemd320(__pyx_v_msg_str), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_decode_cpp_string(ripemd320(__pyx_v_msg_str), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(PyString_CheckExact(__pyx_t_1))||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 24, __pyx_L1_error)
   __pyx_r = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "ripemd320.pyx":22
+  /* "hashpkg/ripemd320.pyx":13
+ *     return res.first.decode('ascii'), res.second
  * 
- * 
- * def py_ripemd320__(message: str) -> str:             # <<<<<<<<<<<<<<
+ * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  *     return ripemd320(msg_str).decode('ascii')
  */
@@ -1466,7 +1449,7 @@ static PyObject *__pyx_pf_6RIPEMD_2py_ripemd320__(CYTHON_UNUSED PyObject *__pyx_
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("RIPEMD.py_ripemd320__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("hashpkg.ripemd320.py_ripemd320", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1860,17 +1843,17 @@ static PyMethodDef __pyx_methods[] = {
 #if PY_MAJOR_VERSION >= 3
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 static PyObject* __pyx_pymod_create(PyObject *spec, PyModuleDef *def); /*proto*/
-static int __pyx_pymod_exec_RIPEMD(PyObject* module); /*proto*/
+static int __pyx_pymod_exec_ripemd320(PyObject* module); /*proto*/
 static PyModuleDef_Slot __pyx_moduledef_slots[] = {
   {Py_mod_create, (void*)__pyx_pymod_create},
-  {Py_mod_exec, (void*)__pyx_pymod_exec_RIPEMD},
+  {Py_mod_exec, (void*)__pyx_pymod_exec_ripemd320},
   {0, NULL}
 };
 #endif
 
 static struct PyModuleDef __pyx_moduledef = {
     PyModuleDef_HEAD_INIT,
-    "RIPEMD",
+    "ripemd320",
     0, /* m_doc */
   #if CYTHON_PEP489_MULTI_PHASE_INIT
     0, /* m_size */
@@ -1899,17 +1882,15 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
-  {&__pyx_n_s_RIPEMD, __pyx_k_RIPEMD, sizeof(__pyx_k_RIPEMD), 0, 0, 1, 1},
-  {&__pyx_n_s_ascii, __pyx_k_ascii, sizeof(__pyx_k_ascii), 0, 0, 1, 1},
   {&__pyx_n_s_bit_pos, __pyx_k_bit_pos, sizeof(__pyx_k_bit_pos), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
-  {&__pyx_n_s_encode, __pyx_k_encode, sizeof(__pyx_k_encode), 0, 0, 1, 1},
+  {&__pyx_n_s_hashpkg_ripemd320, __pyx_k_hashpkg_ripemd320, sizeof(__pyx_k_hashpkg_ripemd320), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_message, __pyx_k_message, sizeof(__pyx_k_message), 0, 0, 1, 1},
   {&__pyx_n_s_msg_str, __pyx_k_msg_str, sizeof(__pyx_k_msg_str), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_py_ripemd320, __pyx_k_py_ripemd320, sizeof(__pyx_k_py_ripemd320), 0, 0, 1, 1},
-  {&__pyx_n_s_py_ripemd320_2, __pyx_k_py_ripemd320_2, sizeof(__pyx_k_py_ripemd320_2), 0, 0, 1, 1},
+  {&__pyx_n_s_py_ripemd320_with_shift, __pyx_k_py_ripemd320_with_shift, sizeof(__pyx_k_py_ripemd320_with_shift), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_s_res, __pyx_k_res, sizeof(__pyx_k_res), 0, 0, 1, 1},
   {&__pyx_kp_s_ripemd320_pyx, __pyx_k_ripemd320_pyx, sizeof(__pyx_k_ripemd320_pyx), 0, 0, 1, 0},
@@ -1927,29 +1908,29 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "ripemd320.pyx":14
+  /* "hashpkg/ripemd320.pyx":6
+ * from ripemd320 cimport ripemd320_with_bit_change, ripemd320
  * 
- * 
- * def py_ripemd320(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
+ * def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
  */
-  __pyx_tuple_ = PyTuple_Pack(4, __pyx_n_s_message, __pyx_n_s_bit_pos, __pyx_n_s_msg_str, __pyx_n_s_res); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(4, __pyx_n_s_message, __pyx_n_s_bit_pos, __pyx_n_s_msg_str, __pyx_n_s_res); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
-  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ripemd320_pyx, __pyx_n_s_py_ripemd320, 14, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ripemd320_pyx, __pyx_n_s_py_ripemd320_with_shift, 6, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 6, __pyx_L1_error)
 
-  /* "ripemd320.pyx":22
+  /* "hashpkg/ripemd320.pyx":13
+ *     return res.first.decode('ascii'), res.second
  * 
- * 
- * def py_ripemd320__(message: str) -> str:             # <<<<<<<<<<<<<<
+ * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  *     return ripemd320(msg_str).decode('ascii')
  */
-  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_n_s_message, __pyx_n_s_msg_str); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_n_s_message, __pyx_n_s_msg_str); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
-  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ripemd320_pyx, __pyx_n_s_py_ripemd320_2, 22, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ripemd320_pyx, __pyx_n_s_py_ripemd320, 13, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -1958,7 +1939,6 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 }
 
 static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
-  __pyx_umethod_PyString_Type_encode.type = (PyObject*)&PyString_Type;
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
   return 0;
   __pyx_L1_error:;
@@ -2048,11 +2028,11 @@ static int __Pyx_modinit_function_import_code(void) {
 
 
 #if PY_MAJOR_VERSION < 3
-__Pyx_PyMODINIT_FUNC initRIPEMD(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC initRIPEMD(void)
+__Pyx_PyMODINIT_FUNC initripemd320(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC initripemd320(void)
 #else
-__Pyx_PyMODINIT_FUNC PyInit_RIPEMD(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC PyInit_RIPEMD(void)
+__Pyx_PyMODINIT_FUNC PyInit_ripemd320(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC PyInit_ripemd320(void)
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 {
   return PyModuleDef_Init(&__pyx_moduledef);
@@ -2119,7 +2099,7 @@ bad:
 }
 
 
-static CYTHON_SMALL_CODE int __pyx_pymod_exec_RIPEMD(PyObject *__pyx_pyinit_module)
+static CYTHON_SMALL_CODE int __pyx_pymod_exec_ripemd320(PyObject *__pyx_pyinit_module)
 #endif
 #endif
 {
@@ -2131,7 +2111,7 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_RIPEMD(PyObject *__pyx_pyinit_modu
   #if CYTHON_PEP489_MULTI_PHASE_INIT
   if (__pyx_m) {
     if (__pyx_m == __pyx_pyinit_module) return 0;
-    PyErr_SetString(PyExc_RuntimeError, "Module 'RIPEMD' has already been imported. Re-initialisation is not supported.");
+    PyErr_SetString(PyExc_RuntimeError, "Module 'ripemd320' has already been imported. Re-initialisation is not supported.");
     return -1;
   }
   #elif PY_MAJOR_VERSION >= 3
@@ -2146,7 +2126,7 @@ if (!__Pyx_RefNanny) {
       Py_FatalError("failed to import 'refnanny' module");
 }
 #endif
-  __Pyx_RefNannySetupContext("__Pyx_PyMODINIT_FUNC PyInit_RIPEMD(void)", 0);
+  __Pyx_RefNannySetupContext("__Pyx_PyMODINIT_FUNC PyInit_ripemd320(void)", 0);
   if (__Pyx_check_binary_version() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #ifdef __Pxy_PyFrame_Initialize_Offsets
   __Pxy_PyFrame_Initialize_Offsets();
@@ -2185,7 +2165,7 @@ if (!__Pyx_RefNanny) {
   Py_INCREF(__pyx_m);
   #else
   #if PY_MAJOR_VERSION < 3
-  __pyx_m = Py_InitModule4("RIPEMD", __pyx_methods, 0, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
+  __pyx_m = Py_InitModule4("ripemd320", __pyx_methods, 0, 0, PYTHON_API_VERSION); Py_XINCREF(__pyx_m);
   #else
   __pyx_m = PyModule_Create(&__pyx_moduledef);
   #endif
@@ -2203,14 +2183,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_RIPEMD) {
+  if (__pyx_module_is_main_hashpkg__ripemd320) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "RIPEMD")) {
-      if (unlikely(PyDict_SetItemString(modules, "RIPEMD", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "hashpkg.ripemd320")) {
+      if (unlikely(PyDict_SetItemString(modules, "hashpkg.ripemd320", __pyx_m) < 0)) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -2231,34 +2211,34 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "ripemd320.pyx":14
+  /* "hashpkg/ripemd320.pyx":6
+ * from ripemd320 cimport ripemd320_with_bit_change, ripemd320
  * 
- * 
- * def py_ripemd320(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
+ * def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6RIPEMD_1py_ripemd320, NULL, __pyx_n_s_RIPEMD); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_7hashpkg_9ripemd320_1py_ripemd320_with_shift, NULL, __pyx_n_s_hashpkg_ripemd320); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_py_ripemd320, __pyx_t_1) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_py_ripemd320_with_shift, __pyx_t_1) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "ripemd320.pyx":22
+  /* "hashpkg/ripemd320.pyx":13
+ *     return res.first.decode('ascii'), res.second
  * 
- * 
- * def py_ripemd320__(message: str) -> str:             # <<<<<<<<<<<<<<
+ * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  *     return ripemd320(msg_str).decode('ascii')
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6RIPEMD_3py_ripemd320__, NULL, __pyx_n_s_RIPEMD); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_7hashpkg_9ripemd320_3py_ripemd320, NULL, __pyx_n_s_hashpkg_ripemd320); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_py_ripemd320_2, __pyx_t_1) < 0) __PYX_ERR(0, 22, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_py_ripemd320, __pyx_t_1) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "ripemd320.pyx":1
+  /* "hashpkg/ripemd320.pyx":1
  * # distutils: language = c++             # <<<<<<<<<<<<<<
- * # distutils: sources = ../../cpp/ripemd.cpp ../../cpp/helpers.cpp
- * from libcpp.string cimport string
+ * # distutils: sources = ripemd.cpp helpers.cpp
+ * 
  */
   __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -2280,11 +2260,11 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_1);
   if (__pyx_m) {
     if (__pyx_d) {
-      __Pyx_AddTraceback("init RIPEMD", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init hashpkg.ripemd320", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     Py_CLEAR(__pyx_m);
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init RIPEMD");
+    PyErr_SetString(PyExc_ImportError, "init hashpkg.ripemd320");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
@@ -2478,112 +2458,6 @@ static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *nam
     return 0;
 }
 
-/* PyObjectCall */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
-    PyObject *result;
-    ternaryfunc call = func->ob_type->tp_call;
-    if (unlikely(!call))
-        return PyObject_Call(func, arg, kw);
-    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
-        return NULL;
-    result = (*call)(func, arg, kw);
-    Py_LeaveRecursiveCall();
-    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
-        PyErr_SetString(
-            PyExc_SystemError,
-            "NULL result without error in PyObject_Call");
-    }
-    return result;
-}
-#endif
-
-/* PyObjectGetAttrStr */
-#if CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject* attr_name) {
-    PyTypeObject* tp = Py_TYPE(obj);
-    if (likely(tp->tp_getattro))
-        return tp->tp_getattro(obj, attr_name);
-#if PY_MAJOR_VERSION < 3
-    if (likely(tp->tp_getattr))
-        return tp->tp_getattr(obj, PyString_AS_STRING(attr_name));
-#endif
-    return PyObject_GetAttr(obj, attr_name);
-}
-#endif
-
-/* UnpackUnboundCMethod */
-static int __Pyx_TryUnpackUnboundCMethod(__Pyx_CachedCFunction* target) {
-    PyObject *method;
-    method = __Pyx_PyObject_GetAttrStr(target->type, *target->method_name);
-    if (unlikely(!method))
-        return -1;
-    target->method = method;
-#if CYTHON_COMPILING_IN_CPYTHON
-    #if PY_MAJOR_VERSION >= 3
-    if (likely(__Pyx_TypeCheck(method, &PyMethodDescr_Type)))
-    #endif
-    {
-        PyMethodDescrObject *descr = (PyMethodDescrObject*) method;
-        target->func = descr->d_method->ml_meth;
-        target->flag = descr->d_method->ml_flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_STACKLESS);
-    }
-#endif
-    return 0;
-}
-
-/* CallUnboundCMethod1 */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg) {
-    if (likely(cfunc->func)) {
-        int flag = cfunc->flag;
-        if (flag == METH_O) {
-            return (*(cfunc->func))(self, arg);
-        } else if (PY_VERSION_HEX >= 0x030600B1 && flag == METH_FASTCALL) {
-            if (PY_VERSION_HEX >= 0x030700A0) {
-                return (*(__Pyx_PyCFunctionFast)(void*)(PyCFunction)cfunc->func)(self, &arg, 1);
-            } else {
-                return (*(__Pyx_PyCFunctionFastWithKeywords)(void*)(PyCFunction)cfunc->func)(self, &arg, 1, NULL);
-            }
-        } else if (PY_VERSION_HEX >= 0x030700A0 && flag == (METH_FASTCALL | METH_KEYWORDS)) {
-            return (*(__Pyx_PyCFunctionFastWithKeywords)(void*)(PyCFunction)cfunc->func)(self, &arg, 1, NULL);
-        }
-    }
-    return __Pyx__CallUnboundCMethod1(cfunc, self, arg);
-}
-#endif
-static PyObject* __Pyx__CallUnboundCMethod1(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg){
-    PyObject *args, *result = NULL;
-    if (unlikely(!cfunc->func && !cfunc->method) && unlikely(__Pyx_TryUnpackUnboundCMethod(cfunc) < 0)) return NULL;
-#if CYTHON_COMPILING_IN_CPYTHON
-    if (cfunc->func && (cfunc->flag & METH_VARARGS)) {
-        args = PyTuple_New(1);
-        if (unlikely(!args)) goto bad;
-        Py_INCREF(arg);
-        PyTuple_SET_ITEM(args, 0, arg);
-        if (cfunc->flag & METH_KEYWORDS)
-            result = (*(PyCFunctionWithKeywords)(void*)(PyCFunction)cfunc->func)(self, args, NULL);
-        else
-            result = (*cfunc->func)(self, args);
-    } else {
-        args = PyTuple_New(2);
-        if (unlikely(!args)) goto bad;
-        Py_INCREF(self);
-        PyTuple_SET_ITEM(args, 0, self);
-        Py_INCREF(arg);
-        PyTuple_SET_ITEM(args, 1, arg);
-        result = __Pyx_PyObject_Call(cfunc->method, args, NULL);
-    }
-#else
-    args = PyTuple_Pack(2, self, arg);
-    if (unlikely(!args)) goto bad;
-    result = __Pyx_PyObject_Call(cfunc->method, args, NULL);
-#endif
-bad:
-    Py_XDECREF(args);
-    return result;
-}
-
 /* decode_c_bytes */
 static CYTHON_INLINE PyObject* __Pyx_decode_c_bytes(
          const char* cstring, Py_ssize_t length, Py_ssize_t start, Py_ssize_t stop,
@@ -2610,6 +2484,20 @@ static CYTHON_INLINE PyObject* __Pyx_decode_c_bytes(
         return PyUnicode_Decode(cstring, length, encoding, errors);
     }
 }
+
+/* PyObjectGetAttrStr */
+#if CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject* attr_name) {
+    PyTypeObject* tp = Py_TYPE(obj);
+    if (likely(tp->tp_getattro))
+        return tp->tp_getattro(obj, attr_name);
+#if PY_MAJOR_VERSION < 3
+    if (likely(tp->tp_getattr))
+        return tp->tp_getattr(obj, PyString_AS_STRING(attr_name));
+#endif
+    return PyObject_GetAttr(obj, attr_name);
+}
+#endif
 
 /* GetBuiltinName */
 static PyObject *__Pyx_GetBuiltinName(PyObject *name) {
