@@ -1202,9 +1202,9 @@ static PyObject *__pyx_codeobj__2;
 static PyObject *__pyx_codeobj__4;
 /* Late includes */
 
-/* "ripemd320.pyx":6
- * from ripemd320 cimport ripemd320_with_bit_change, ripemd320
+/* "ripemd320.pyx":7
  * 
+ * # Create python function definitions for cython code
  * def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
@@ -1245,11 +1245,11 @@ static PyObject *__pyx_pw_9ripemd320_1py_ripemd320_with_shift(PyObject *__pyx_se
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_bit_pos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("py_ripemd320_with_shift", 1, 2, 2, 1); __PYX_ERR(0, 6, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("py_ripemd320_with_shift", 1, 2, 2, 1); __PYX_ERR(0, 7, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "py_ripemd320_with_shift") < 0)) __PYX_ERR(0, 6, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "py_ripemd320_with_shift") < 0)) __PYX_ERR(0, 7, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -1262,13 +1262,13 @@ static PyObject *__pyx_pw_9ripemd320_1py_ripemd320_with_shift(PyObject *__pyx_se
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("py_ripemd320_with_shift", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 6, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("py_ripemd320_with_shift", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 7, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("ripemd320.py_ripemd320_with_shift", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_message), (&PyUnicode_Type), 1, "message", 1))) __PYX_ERR(0, 6, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_message), (&PyUnicode_Type), 1, "message", 1))) __PYX_ERR(0, 7, __pyx_L1_error)
   __pyx_r = __pyx_pf_9ripemd320_py_ripemd320_with_shift(__pyx_self, __pyx_v_message, __pyx_v_bit_pos);
 
   /* function exit code */
@@ -1295,8 +1295,8 @@ static PyObject *__pyx_pf_9ripemd320_py_ripemd320_with_shift(CYTHON_UNUSED PyObj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("py_ripemd320_with_shift", 0);
 
-  /* "ripemd320.pyx":7
- * 
+  /* "ripemd320.pyx":8
+ * # Create python function definitions for cython code
  * def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:
  *     cdef string msg_str = message.encode('ascii')             # <<<<<<<<<<<<<<
  * 
@@ -1304,25 +1304,25 @@ static PyObject *__pyx_pf_9ripemd320_py_ripemd320_with_shift(CYTHON_UNUSED PyObj
  */
   if (unlikely(__pyx_v_message == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-    __PYX_ERR(0, 7, __pyx_L1_error)
+    __PYX_ERR(0, 8, __pyx_L1_error)
   }
-  __pyx_t_1 = PyUnicode_AsASCIIString(__pyx_v_message); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = PyUnicode_AsASCIIString(__pyx_v_message); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_msg_str = __pyx_t_2;
 
-  /* "ripemd320.pyx":9
+  /* "ripemd320.pyx":10
  *     cdef string msg_str = message.encode('ascii')
  * 
  *     cdef pair[string, vector[uint32_t]] res = ripemd320_with_bit_change(msg_str, bit_pos)             # <<<<<<<<<<<<<<
  * 
  *     return res.first.decode('ascii'), res.second
  */
-  __pyx_t_3 = __Pyx_PyInt_As_uint64_t(__pyx_v_bit_pos); if (unlikely((__pyx_t_3 == ((uint64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_uint64_t(__pyx_v_bit_pos); if (unlikely((__pyx_t_3 == ((uint64_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 10, __pyx_L1_error)
   __pyx_v_res = ripemd320_with_bit_change(__pyx_v_msg_str, __pyx_t_3);
 
-  /* "ripemd320.pyx":11
+  /* "ripemd320.pyx":12
  *     cdef pair[string, vector[uint32_t]] res = ripemd320_with_bit_change(msg_str, bit_pos)
  * 
  *     return res.first.decode('ascii'), res.second             # <<<<<<<<<<<<<<
@@ -1330,11 +1330,11 @@ static PyObject *__pyx_pf_9ripemd320_py_ripemd320_with_shift(CYTHON_UNUSED PyObj
  * def py_ripemd320(message: str) -> str:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_decode_cpp_string(__pyx_v_res.first, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_decode_cpp_string(__pyx_v_res.first, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __pyx_convert_vector_to_py_uint32_t(__pyx_v_res.second); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_4 = __pyx_convert_vector_to_py_uint32_t(__pyx_v_res.second); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -1346,9 +1346,9 @@ static PyObject *__pyx_pf_9ripemd320_py_ripemd320_with_shift(CYTHON_UNUSED PyObj
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "ripemd320.pyx":6
- * from ripemd320 cimport ripemd320_with_bit_change, ripemd320
+  /* "ripemd320.pyx":7
  * 
+ * # Create python function definitions for cython code
  * def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
@@ -1367,12 +1367,12 @@ static PyObject *__pyx_pf_9ripemd320_py_ripemd320_with_shift(CYTHON_UNUSED PyObj
   return __pyx_r;
 }
 
-/* "ripemd320.pyx":13
+/* "ripemd320.pyx":14
  *     return res.first.decode('ascii'), res.second
  * 
  * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
- *     return ripemd320(msg_str).decode('ascii')
+ * 
  */
 
 /* Python wrapper */
@@ -1385,7 +1385,7 @@ static PyObject *__pyx_pw_9ripemd320_3py_ripemd320(PyObject *__pyx_self, PyObjec
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("py_ripemd320 (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_message), (&PyUnicode_Type), 1, "message", 1))) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_message), (&PyUnicode_Type), 1, "message", 1))) __PYX_ERR(0, 14, __pyx_L1_error)
   __pyx_r = __pyx_pf_9ripemd320_2py_ripemd320(__pyx_self, ((PyObject*)__pyx_v_message));
 
   /* function exit code */
@@ -1399,54 +1399,80 @@ static PyObject *__pyx_pw_9ripemd320_3py_ripemd320(PyObject *__pyx_self, PyObjec
 
 static PyObject *__pyx_pf_9ripemd320_2py_ripemd320(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_message) {
   std::string __pyx_v_msg_str;
+  std::pair<std::string,std::vector<uint32_t> >  __pyx_v_res;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   std::string __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("py_ripemd320", 0);
 
-  /* "ripemd320.pyx":14
+  /* "ripemd320.pyx":15
  * 
  * def py_ripemd320(message: str) -> str:
  *     cdef string msg_str = message.encode('ascii')             # <<<<<<<<<<<<<<
- *     return ripemd320(msg_str).decode('ascii')
+ * 
+ *     cdef pair[string, vector[uint32_t]] res = ripemd320(msg_str)
  */
   if (unlikely(__pyx_v_message == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-    __PYX_ERR(0, 14, __pyx_L1_error)
+    __PYX_ERR(0, 15, __pyx_L1_error)
   }
-  __pyx_t_1 = PyUnicode_AsASCIIString(__pyx_v_message); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_1 = PyUnicode_AsASCIIString(__pyx_v_message); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_msg_str = __pyx_t_2;
 
-  /* "ripemd320.pyx":15
- * def py_ripemd320(message: str) -> str:
+  /* "ripemd320.pyx":17
  *     cdef string msg_str = message.encode('ascii')
- *     return ripemd320(msg_str).decode('ascii')             # <<<<<<<<<<<<<<
+ * 
+ *     cdef pair[string, vector[uint32_t]] res = ripemd320(msg_str)             # <<<<<<<<<<<<<<
+ * 
+ *     return res.first.decode('ascii'), res.second
+ */
+  __pyx_v_res = ripemd320(__pyx_v_msg_str);
+
+  /* "ripemd320.pyx":19
+ *     cdef pair[string, vector[uint32_t]] res = ripemd320(msg_str)
+ * 
+ *     return res.first.decode('ascii'), res.second             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_decode_cpp_string(ripemd320(__pyx_v_msg_str), 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_decode_cpp_string(__pyx_v_res.first, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_r = ((PyObject*)__pyx_t_1);
+  __pyx_t_3 = __pyx_convert_vector_to_py_uint32_t(__pyx_v_res.second); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_1);
+  PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_3);
   __pyx_t_1 = 0;
+  __pyx_t_3 = 0;
+  if (!(likely(PyUnicode_CheckExact(__pyx_t_4))||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_t_4)->tp_name), 0))) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_r = ((PyObject*)__pyx_t_4);
+  __pyx_t_4 = 0;
   goto __pyx_L0;
 
-  /* "ripemd320.pyx":13
+  /* "ripemd320.pyx":14
  *     return res.first.decode('ascii'), res.second
  * 
  * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
- *     return ripemd320(msg_str).decode('ascii')
+ * 
  */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
   __Pyx_AddTraceback("ripemd320.py_ripemd320", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -1906,29 +1932,29 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "ripemd320.pyx":6
- * from ripemd320 cimport ripemd320_with_bit_change, ripemd320
+  /* "ripemd320.pyx":7
  * 
+ * # Create python function definitions for cython code
  * def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
  */
-  __pyx_tuple_ = PyTuple_Pack(4, __pyx_n_s_message, __pyx_n_s_bit_pos, __pyx_n_s_msg_str, __pyx_n_s_res); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(4, __pyx_n_s_message, __pyx_n_s_bit_pos, __pyx_n_s_msg_str, __pyx_n_s_res); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
-  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ripemd320_pyx, __pyx_n_s_py_ripemd320_with_shift, 6, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ripemd320_pyx, __pyx_n_s_py_ripemd320_with_shift, 7, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 7, __pyx_L1_error)
 
-  /* "ripemd320.pyx":13
+  /* "ripemd320.pyx":14
  *     return res.first.decode('ascii'), res.second
  * 
  * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
- *     return ripemd320(msg_str).decode('ascii')
+ * 
  */
-  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_n_s_message, __pyx_n_s_msg_str); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(3, __pyx_n_s_message, __pyx_n_s_msg_str, __pyx_n_s_res); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
-  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ripemd320_pyx, __pyx_n_s_py_ripemd320, 13, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(1, 0, 3, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_ripemd320_pyx, __pyx_n_s_py_ripemd320, 14, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -2209,28 +2235,28 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "ripemd320.pyx":6
- * from ripemd320 cimport ripemd320_with_bit_change, ripemd320
+  /* "ripemd320.pyx":7
  * 
+ * # Create python function definitions for cython code
  * def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9ripemd320_1py_ripemd320_with_shift, NULL, __pyx_n_s_ripemd320); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9ripemd320_1py_ripemd320_with_shift, NULL, __pyx_n_s_ripemd320); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_py_ripemd320_with_shift, __pyx_t_1) < 0) __PYX_ERR(0, 6, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_py_ripemd320_with_shift, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "ripemd320.pyx":13
+  /* "ripemd320.pyx":14
  *     return res.first.decode('ascii'), res.second
  * 
  * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
- *     return ripemd320(msg_str).decode('ascii')
+ * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9ripemd320_3py_ripemd320, NULL, __pyx_n_s_ripemd320); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9ripemd320_3py_ripemd320, NULL, __pyx_n_s_ripemd320); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_py_ripemd320, __pyx_t_1) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_py_ripemd320, __pyx_t_1) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "ripemd320.pyx":1

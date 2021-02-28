@@ -34,7 +34,7 @@ def main():
         message = item['message'] if 'message' in item else ''
         print('_' * 100)
         print(f'Message: {message}')
-        print(f'Default hash: {py_ripemd320(message)}\n')
+        print(f'Default hash: {py_ripemd320(message)[0]}\n')
 
         fig, ax = plt.subplots()
         fig.subplots_adjust(bottom=0.2)
@@ -44,7 +44,7 @@ def main():
         if len(bits_to_change) > 5:
             bits_to_change = bits_to_change[:5]
 
-        cmap = plt.cm.get_cmap('Set1', len(message) << 3)
+        cmap = plt.cm.get_cmap('gist_rainbow', len(message) << 3)
 
         # generate hashes with different parameters
         for bit in bits_to_change:

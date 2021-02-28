@@ -62,7 +62,7 @@ while True:         # Event Loop
         # Plot avalanche effect
         plt.subplots_adjust(bottom=0.2)
         x = range(1, len(bits) + 1)
-        cmap = plt.cm.get_cmap('Set3', (len(message) << 3) + 1)
+        cmap = plt.cm.get_cmap('gist_rainbow', (len(message) << 3) + 1)
         p1 = plt.plot(x, bits, color=cmap(bit_to_change), label=f'bit {bit_to_change}')
 
         plt.ylabel('Changed bits')
@@ -73,4 +73,5 @@ while True:         # Event Loop
         plt.show(block=False)
     elif event == 'generate':                   # if 'hash' button was pressed
         # Generate hash from 'message' input and put it in 'hash' input
-        window['hash'].update(py_ripemd320(values['message']))
+        hash_val = py_ripemd320(values['message'])[0]
+        window['hash'].update(hash_val)

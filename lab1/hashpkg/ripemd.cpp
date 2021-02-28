@@ -136,10 +136,10 @@ std::pair<uint32_t*, std::vector<uint32_t>> methods::generate_hashes(uint32_t bl
 }
 
 // Алгоритм преобразования
-std::string ripemd320(std::string message) {
+std::pair<std::string, std::vector<uint32_t>> ripemd320(std::string message) {
     using namespace methods;
     
-    // Размер сообщения в битах
+    // Размер сообщения  в битах
     uint64_t bitlen = message.size() * 8;
 
     // Добавление дополнительных битов
@@ -152,17 +152,17 @@ std::string ripemd320(std::string message) {
     uint32_t **blocks = generate_blocks_array(blocks_count, bitlen, message);
 
     // Основной цикл
-    uint32_t *hashes = generate_hashes(blocks_count, blocks).first;
+    auto pair = generate_hashes(blocks_count, blocks);
 
     // Результат в виде хэш-сообщения
     std::ostringstream result;
 
     result << std::hex;
     for (size_t i = 0; i < N; i++) {
-        result << std::setfill('0') << std::setw(8) << inv(hashes[i]);
+        result << std::setfill('0') << std::setw(8) << inv(pair.first[i]);
     }
 
-    return result.str();
+    return std::make_pair(result.str(), pair.second);
 }
 
 std::pair<std::string, std::vector<uint32_t>> ripemd320_with_bit_change(std::string message, uint64_t bit_pos) {
@@ -192,7 +192,7 @@ std::pair<std::string, std::vector<uint32_t>> ripemd320_with_bit_change(std::str
 
     result << std::hex;
     for (size_t i = 0; i < N; i++) {
-        result << inv(pair.first[i]);
+        result << std::setfill('0') << std::setw(8) << inv(pair.first[i]);
     }
 
     return std::make_pair(result.str(), pair.second);
