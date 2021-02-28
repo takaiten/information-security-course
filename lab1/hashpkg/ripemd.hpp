@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 
 namespace methods {
     void add_additional_bits(std::string &message);

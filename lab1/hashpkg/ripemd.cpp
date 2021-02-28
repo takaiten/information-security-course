@@ -3,6 +3,7 @@
 #include <bitset>
 #include <vector>
 #include <tuple>
+#include <iomanip>
 
 #include "ripemd.hpp"
 #include "helpers.hpp"
@@ -18,7 +19,7 @@ void methods::add_additional_bits(std::string &message) {
     message.push_back((uint8_t) 0x80);
 
     // До тех пор, пока длина сообщения не станет равной 448(mod 512),
-    while ((message.size() * 8) % 512 != 448)
+    while ((message.size() << 3) % 512 != 448)
         // Заполняем сообщение нулями
         message.push_back(0);
 }
@@ -34,7 +35,7 @@ uint32_t **methods::generate_blocks_array(uint32_t blocks_count, uint64_t bitlen
         // Если это не последний блок, то переносим преобразованное message в X
         // Если блок послений, то делаем то же самое, но оставляем 8 байт под bitlen
         for (uint32_t j = 0; j < (i == blocks_count - 1 ? 14 : 16); j++)
-            X[i][j] = bytes_to_uint(&message[(j * 4) + 64 * i]);
+            X[i][j] = bytes_to_uint(&message[(j << 2) + (i << 6)]);
 
         // Если это после дний блок
         if (i == blocks_count - 1) {
@@ -158,7 +159,7 @@ std::string ripemd320(std::string message) {
 
     result << std::hex;
     for (size_t i = 0; i < N; i++) {
-        result << inv(hashes[i]);
+        result << std::setfill('0') << std::setw(8) << inv(hashes[i]);
     }
 
     return result.str();

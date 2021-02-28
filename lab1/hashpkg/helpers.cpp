@@ -68,12 +68,13 @@ uint32_t inv(uint32_t value) {
 
 // Преобразование 4-х байт в uint32_t
 uint32_t bytes_to_uint(const char *bytes) {
-    uint32_t res = 0;
-
-    res |= ((uint32_t) bytes[3] << 24) & 0xFF000000;
-    res |= ((uint32_t) bytes[2] << 16) & 0xFF0000;
-    res |= ((uint32_t) bytes[1] << 8) & 0xFF00;
-    res |= ((uint32_t) bytes[0] << 0) & 0xFF;
-
-    return res;
+//    uint32_t res = 0;
+//
+//    res |= ((uint32_t) bytes[3] << 24) & 0xFF000000;
+//    res |= ((uint32_t) bytes[2] << 16) & 0xFF0000;
+//    res |= ((uint32_t) bytes[1] << 8) & 0xFF00;
+//    res |= ((uint32_t) bytes[0] << 0) & 0xFF;
+//
+//    return res;
+    return *(uint32_t *)bytes;
 }
