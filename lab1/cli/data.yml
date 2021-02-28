@@ -1,5 +1,3 @@
 - message: examples
   bits: [0, 4, 8, 16, 32]
-- message: test message
-- message: c++ and python
-  bits: [5, 10, 15]
+- message: Hello, world!

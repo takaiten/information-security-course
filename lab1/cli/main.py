@@ -44,7 +44,7 @@ def main():
         if len(bits_to_change) > 5:
             bits_to_change = bits_to_change[:5]
 
-        cmap = plt.cm.get_cmap('hsv', len(message) << 3)
+        cmap = plt.cm.get_cmap('Set1', len(message) << 3)
 
         # generate hashes with different parameters
         for bit in bits_to_change:

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from lab1.hashpkg.ripemd320 import py_ripemd320_with_shift, py_ripemd320
 
 # Read file
-initial_message = None
+initial_message = ''
 
 try:
     with open('./gui/message.txt', 'r+') as file:
@@ -62,7 +62,7 @@ while True:         # Event Loop
         # Plot avalanche effect
         plt.subplots_adjust(bottom=0.2)
         x = range(1, len(bits) + 1)
-        cmap = plt.cm.get_cmap('hsv', (len(message) << 3) + 1)
+        cmap = plt.cm.get_cmap('Set3', (len(message) << 3) + 1)
         p1 = plt.plot(x, bits, color=cmap(bit_to_change), label=f'bit {bit_to_change}')
 
         plt.ylabel('Changed bits')

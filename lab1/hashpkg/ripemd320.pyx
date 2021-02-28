@@ -3,6 +3,7 @@
 
 from ripemd320 cimport ripemd320_with_bit_change, ripemd320
 
+# Create python function definitions for cython code
 def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:
     cdef string msg_str = message.encode('ascii')
 
