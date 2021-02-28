@@ -26,6 +26,7 @@ main_layout = [
 
 graph_layout = [
     [sg.Text('Bit to change:'), sg.Input(key='bit', default_text='0'), sg.Button('Graph', key='graph')],
+    [sg.Text('Hash:', size=(8, 1)), sg.Multiline(key='hash_changed', disabled=True)],
 ]
 
 layout = [
@@ -33,9 +34,10 @@ layout = [
     [sg.Frame('Avalanche Effect', graph_layout, key='frame2')],
 ]
 
-window = sg.Window('RIPEMD-320', layout, size=(600, 200), font=('Fira Code Retina', 10), finalize=True)
+window = sg.Window('RIPEMD-320', layout, size=(600, 250), font=('Fira Code Retina', 10), finalize=True)
 window['bit'].expand(expand_x=True)
 window['hash'].expand(expand_x=True)
+window['hash_changed'].expand(expand_x=True)
 window['message'].expand(expand_x=True)
 window['frame1'].expand(expand_x=True)
 window['frame2'].expand(expand_x=True)
@@ -54,20 +56,30 @@ while True:         # Event Loop
         except ValueError:
             window['bit'].update('0')
             continue
+
         # Clamp bit_to_change from 0 to len(message) in bits
-        bit_to_change = max(0, min(bit_to_change, len(message) << 3))
+        bit_to_change = max(0, min(bit_to_change, (len(message) << 3) - 1))
         # Calculate hash and number of changed bits on each round
-        md, bits = py_ripemd320_with_shift(message, bit_to_change)
+        hash_val, bits = py_ripemd320_with_shift(message, bit_to_change)
+
+        window['hash_changed'].update(hash_val)
+
+        # Clear and setup figure
+        plt.subplots_adjust(bottom=0.2)
+        plt.clf()
 
         # Plot avalanche effect
-        plt.subplots_adjust(bottom=0.2)
         x = range(1, len(bits) + 1)
-        cmap = plt.cm.get_cmap('gist_rainbow', (len(message) << 3) + 1)
-        p1 = plt.plot(x, bits, color=cmap(bit_to_change), label=f'bit {bit_to_change}')
+        plt.plot(x, bits, color='tab:red', label=f'bit {bit_to_change}')
+
+        # Plot changed bits when on default hash
+        x = range(1, len(bits) + 1)
+        bits = py_ripemd320(message)[1]
+        plt.plot(x, bits, color='black', label=f'default')
 
         plt.ylabel('Changed bits')
         plt.xlabel('Round')
-        plt.title(f'Length: {len(message) << 3} bits')
+        plt.title(f'Message: "{message}"\nLength: {len(message) << 3} bits')
 
         plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), shadow=True, ncol=5)
         plt.show(block=False)
