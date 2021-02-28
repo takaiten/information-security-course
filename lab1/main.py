@@ -1,7 +1,11 @@
 from hashpkg.ripemd320 import py_ripemd320_with_shift, py_ripemd320
 
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import yaml
+
+
+COLORS_LIST = list(mcolors.TABLEAU_COLORS.values())
 
 
 def read_data():
@@ -24,7 +28,8 @@ def generate_hash_and_plot(message, bit_to_change, ax, color):
 def main():
     data = read_data()
 
-    for index, message in enumerate(data['messages'], start=1):
+    for index, item in enumerate(data, start=1):
+        message = item['message']
         print('_' * 100)
         print(f'Message: {message}')
         print(f'Default hash: {py_ripemd320(message)}\n')
@@ -32,8 +37,8 @@ def main():
         fig, ax = plt.subplots()
 
         # set parameters
-        bits_to_change = [0, len(message) << 2, len(message) << 3]
-        colors = ['r', 'b', 'g']
+        bits_to_change = item['bits'] if 'bits' in item else [0, len(message) << 2, len(message) << 3]
+        colors = COLORS_LIST[:len(bits_to_change)]
 
         # generate hashes with different parameters
         for bit_to_change, color in zip(bits_to_change, colors):

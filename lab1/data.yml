@@ -1,5 +1,4 @@
-messages:
-  - examples
-  - abc
-  - test message
-  - bruh moment
+- message: examples
+- message: abc
+- message: test message
+- message: bruh moment
