@@ -2,6 +2,9 @@ from lab1.hashpkg.ripemd320 import py_ripemd320_with_shift, py_ripemd320
 
 import matplotlib.pyplot as plt
 import yaml
+import matplotlib.colors as mcolors
+
+COLORS = list(mcolors.TABLEAU_COLORS.values())
 
 
 def read_data():
@@ -17,9 +20,9 @@ def plot_avalanche_effect(changed_bits, ax, **kwargs):
     ax.plot(x, changed_bits, **kwargs)
 
 
-def generate_hash_and_plot(message, bit_to_change, ax, cmap):
+def generate_hash_and_plot(message, bit_to_change, ax, color):
     md, bits = py_ripemd320_with_shift(message=message, bit_pos=bit_to_change)
-    plot_avalanche_effect(changed_bits=bits, ax=ax, color=cmap(bit_to_change), label=f'bit {bit_to_change}')
+    plot_avalanche_effect(changed_bits=bits, ax=ax, color=color, label=f'bit {bit_to_change}')
     print(f'Changed bit: {bit_to_change}')
     print(f'Hash: {md}\n')
 
@@ -40,15 +43,19 @@ def main():
         fig.subplots_adjust(bottom=0.2)
 
         # set parameters: bits to change and colors
-        bits_to_change = item['bits'] if 'bits' in item else [0, len(message) << 2, len(message) << 3]
-        if len(bits_to_change) > 5:
-            bits_to_change = bits_to_change[:5]
+        bits_to_change = item['bits'] if 'bits' in item else [0, len(message) << 2, (len(message) << 3) - 1]
+        if len(bits_to_change) > 4:
+            bits_to_change = bits_to_change[:4]
 
-        cmap = plt.cm.get_cmap('gist_rainbow', len(message) << 3)
+        colors = COLORS[:len(bits_to_change)]
 
         # generate hashes with different parameters
-        for bit in bits_to_change:
-            generate_hash_and_plot(message=message, bit_to_change=bit, ax=ax, cmap=cmap)
+        for bit, color in zip(bits_to_change, colors):
+            generate_hash_and_plot(message=message, bit_to_change=bit, ax=ax, color=color)
+
+        # plot avalanche effect for default message
+        md, bits = py_ripemd320(message)
+        plot_avalanche_effect(changed_bits=bits, ax=ax, color='black', label='default')
 
         # Setup plot
         ax.set_title(f'Message: "{message}"\nLength: {len(message) << 3} bits')

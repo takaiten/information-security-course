@@ -11,7 +11,7 @@ def py_ripemd320_with_shift(message: str, bit_pos: int) -> tuple:
 
     return res.first.decode('ascii'), res.second
 
-def py_ripemd320(message: str) -> str:
+def py_ripemd320(message: str) -> tuple:
     cdef string msg_str = message.encode('ascii')
 
     cdef pair[string, vector[uint32_t]] res = ripemd320(msg_str)

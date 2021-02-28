@@ -1327,7 +1327,7 @@ static PyObject *__pyx_pf_9ripemd320_py_ripemd320_with_shift(CYTHON_UNUSED PyObj
  * 
  *     return res.first.decode('ascii'), res.second             # <<<<<<<<<<<<<<
  * 
- * def py_ripemd320(message: str) -> str:
+ * def py_ripemd320(message: str) -> tuple:
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_1 = __Pyx_decode_cpp_string(__pyx_v_res.first, 0, PY_SSIZE_T_MAX, NULL, NULL, PyUnicode_DecodeASCII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 12, __pyx_L1_error)
@@ -1370,7 +1370,7 @@ static PyObject *__pyx_pf_9ripemd320_py_ripemd320_with_shift(CYTHON_UNUSED PyObj
 /* "ripemd320.pyx":14
  *     return res.first.decode('ascii'), res.second
  * 
- * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
+ * def py_ripemd320(message: str) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
  */
@@ -1413,7 +1413,7 @@ static PyObject *__pyx_pf_9ripemd320_2py_ripemd320(CYTHON_UNUSED PyObject *__pyx
 
   /* "ripemd320.pyx":15
  * 
- * def py_ripemd320(message: str) -> str:
+ * def py_ripemd320(message: str) -> tuple:
  *     cdef string msg_str = message.encode('ascii')             # <<<<<<<<<<<<<<
  * 
  *     cdef pair[string, vector[uint32_t]] res = ripemd320(msg_str)
@@ -1455,7 +1455,6 @@ static PyObject *__pyx_pf_9ripemd320_2py_ripemd320(CYTHON_UNUSED PyObject *__pyx
   PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_3);
   __pyx_t_1 = 0;
   __pyx_t_3 = 0;
-  if (!(likely(PyUnicode_CheckExact(__pyx_t_4))||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_t_4)->tp_name), 0))) __PYX_ERR(0, 19, __pyx_L1_error)
   __pyx_r = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
   goto __pyx_L0;
@@ -1463,7 +1462,7 @@ static PyObject *__pyx_pf_9ripemd320_2py_ripemd320(CYTHON_UNUSED PyObject *__pyx
   /* "ripemd320.pyx":14
  *     return res.first.decode('ascii'), res.second
  * 
- * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
+ * def py_ripemd320(message: str) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
  */
@@ -1947,7 +1946,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "ripemd320.pyx":14
  *     return res.first.decode('ascii'), res.second
  * 
- * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
+ * def py_ripemd320(message: str) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
  */
@@ -2250,7 +2249,7 @@ if (!__Pyx_RefNanny) {
   /* "ripemd320.pyx":14
  *     return res.first.decode('ascii'), res.second
  * 
- * def py_ripemd320(message: str) -> str:             # <<<<<<<<<<<<<<
+ * def py_ripemd320(message: str) -> tuple:             # <<<<<<<<<<<<<<
  *     cdef string msg_str = message.encode('ascii')
  * 
  */
