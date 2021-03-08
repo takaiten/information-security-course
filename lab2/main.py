@@ -1,36 +1,20 @@
-from time import time
-from Cryptodome.Cipher import DES3
-from Cryptodome.Util.strxor import strxor
-
-
-def str_to_bytes(s: str) -> bytes:
-    return s.encode('UTF-8')
-
-
-def get_8_byte_time() -> bytes:
-    t = int(time() * 10 ** 6)
-    return str_to_bytes(hex(t)[-8:])
-
-
-def ansi_x9_17(key1: str, key2: str, seed: str):
-    des3 = DES3.new(str_to_bytes(key1 + key2), DES3.MODE_ECB)
-    temp = des3.encrypt(get_8_byte_time())
-    s = str_to_bytes(seed)
-
-    while True:
-        x = des3.encrypt(strxor(s, temp))
-        s = des3.encrypt(strxor(x, temp))
-        yield x
+from lab2.ansi_x9_17 import generate_sequence, convert_to_dec_and_bin
+from lab2.statistical_tests import *
 
 
 def main():
-    key1 = '12345678'
-    key2 = '87654321'
+    key1, key2 = '12345678', '87654321'
     seed = 'examples'
     m = 2
 
-    sequence = [x for x, i in zip(ansi_x9_17(key1, key2, seed), range(m))]
-    print(sequence)
+    sequence = generate_sequence(key1, key2, seed, m)
+    sequence_dec, sequence_bin = convert_to_dec_and_bin(sequence)
+
+    print(f'Sequence dec:\n{sequence_dec}\n')
+    print(f'Sequence bin:\n{sequence_bin}\n')
+
+    results = frequency_test(sequence_bin), identical_bits_test(sequence_bin), arbitrary_deviations_test(sequence_bin)
+    print(f'Tests results: {results}')
 
 
 if __name__ == '__main__':
