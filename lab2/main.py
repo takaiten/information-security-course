@@ -1,21 +1,139 @@
-from lab2.ansi_x9_17 import generate_sequence, convert_to_dec_and_bin
+from lab2.ansi_x9_17 import generate_sequence, convert_to_bin_and_hex
 from lab2.statistical_tests import *
 
-
-def main():
-    key1, key2 = '12345678', '87654321'
-    seed = 'examples'
-    m = 2
-
-    sequence = generate_sequence(key1, key2, seed, m)
-    sequence_dec, sequence_bin = convert_to_dec_and_bin(sequence)
-
-    print(f'Sequence dec:\n{sequence_dec}\n')
-    print(f'Sequence bin:\n{sequence_bin}\n')
-
-    results = frequency_test(sequence_bin), identical_bits_test(sequence_bin), arbitrary_deviations_test(sequence_bin)
-    print(f'Tests results: {results}')
+import PySimpleGUI as sg
 
 
-if __name__ == '__main__':
-    main()
+def create_default_input(text, key, input_type=sg.Input):
+    return [sg.Text(text, size=(11, 1)), input_type(key=key, disabled=True)]
+
+
+default_key1 = '12345678'
+default_key2 = '87654321'
+default_seed = 'examples'
+default_blocks = 2
+
+sg.theme('Reddit')
+
+main_layout = [
+    [sg.Text('Key1:', size=(7, 1)), sg.Input(key='key1', default_text=default_key1)],
+    [sg.Text('Key2:', size=(7, 1)), sg.Input(key='key2', default_text=default_key2)],
+    [sg.Text('Seed:', size=(7, 1)), sg.Input(key='seed', default_text=default_seed)],
+    [sg.Text('Blocks:', size=(7, 1)), sg.Input(key='blocks', default_text=default_blocks)],
+    [sg.Button('Generate', key='generate', pad=(81, 5))],
+]
+
+sequence_layout = [
+    [sg.Text('Hex:', size=(4, 1)), sg.Multiline(key='hex', disabled=True)],
+    [sg.Text('Bin:', size=(4, 1)), sg.Multiline(key='bin', disabled=True)],
+]
+
+test1_layout = [
+    create_default_input('Result', 'test1_result'),
+    create_default_input('Statistics:', 'test1_stat'),
+]
+
+test2_layout = [
+    create_default_input('Result', 'test2_result'),
+    create_default_input('Pi:', 'test2_pi'),
+    create_default_input('V:', 'test2_v'),
+    create_default_input('Statistics:', 'test2_stat'),
+]
+
+test3_layout = [
+    create_default_input('Result', 'test3_result'),
+    create_default_input('S', 'test3_s', sg.Multiline),
+    create_default_input('L:', 'test3_l'),
+]
+
+layout1 = [
+    [sg.Frame('Generate ANSI X9.17', main_layout, key='frame1')],
+    [sg.Frame('Sequence', sequence_layout, key='frame2')],
+]
+
+layout2 = [
+    [sg.Frame('Frequency test', test1_layout, key='frame3')],
+    [sg.Frame('Identical bits test', test2_layout, key='frame4')],
+    [sg.Frame('Arbitrary deviations test', test3_layout, key='frame5')],
+]
+
+layout = [
+    [sg.Frame('Generation', layout1, key='generation'), sg.Frame('Tests', layout2, key='tests')]
+]
+
+window = sg.Window('ANSI X9.17', layout, size=(1450, 550), font=('Fira Code Retina', 10), finalize=True)
+
+
+def set_expand_true(keys: List[str]):
+    for key in keys:
+        window[key].expand(expand_x=True, expand_y=True)
+
+
+set_expand_true(['key1', 'key2', 'seed', 'blocks', 'hex', 'bin',
+                 'test1_result', 'test1_stat',
+                 'test2_result', 'test2_pi', 'test2_v', 'test2_stat',
+                 'test3_result', 'test3_s', 'test3_l',
+                 'frame1', 'frame2', 'frame3', 'frame4', 'frame5',
+                 'generation', 'tests'])
+
+
+def validate_fields(fields) -> bool:
+    errors = []
+
+    for field in ['key1', 'key2', 'seed']:
+        if len(fields[field]) != 8:
+            errors.append(f'{field} must have 8 chars')
+
+    if fields['key1'] == fields['key2']:
+        errors.append('key1 and key2 must be different')
+
+    if len(fields['blocks']) == 0 or not fields['blocks'].isnumeric() or fields['blocks'][0] == '0':
+        errors.append('blocks must be positive integer')
+
+    has_errors = len(errors) != 0
+
+    if has_errors:
+        sg.popup_error('\n'.join(errors))
+
+    return has_errors
+
+
+def format_float_array(arr: List[float]) -> str:
+    new_arr = list(map(lambda x: f'{x:.3f}', arr))
+    n = int(len(new_arr) / 2)
+    return '[' + ', '.join(new_arr[:n]) + '\n ' + ', '.join(new_arr[n:]) + ']'
+
+
+while True:  # Event Loop
+    event, values = window.read()
+
+    if event in (sg.WINDOW_CLOSED, 'Quit'):  # if all windows were closed
+        break
+    elif event == 'generate':
+        if validate_fields(values):
+            continue
+        key1 = values['key1']
+        key2 = values['key2']
+        seed = values['seed']
+        m = int(values['blocks'])
+
+        sequence = generate_sequence(key1, key2, seed, m)
+        sequence_bin, sequence_hex = convert_to_bin_and_hex(sequence)
+
+        window['hex'].update(sequence_hex)
+        window['bin'].update(sequence_bin)
+
+        frequency_test_result = frequency_test(sequence_bin)
+        window['test1_result'].update(frequency_test_result[0])
+        window['test1_stat'].update(frequency_test_result[1])
+
+        identical_bits_test_result = identical_bits_test(sequence_bin)
+        window['test2_result'].update(identical_bits_test_result[0])
+        window['test2_pi'].update(identical_bits_test_result[1])
+        window['test2_v'].update(identical_bits_test_result[2])
+        window['test2_stat'].update(identical_bits_test_result[3])
+
+        arbitrary_deviations_test_result = arbitrary_deviations_test(sequence_bin)
+        window['test3_result'].update(arbitrary_deviations_test_result[0])
+        window['test3_s'].update(format_float_array(arbitrary_deviations_test_result[1]))
+        window['test3_l'].update(arbitrary_deviations_test_result[2])

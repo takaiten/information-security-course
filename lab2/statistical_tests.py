@@ -1,27 +1,31 @@
-from numpy import sqrt, count_nonzero
+from typing import List
 
+# import numpy as np
+from numpy import sqrt, count_nonzero, array
 
 QUANTILE = 1.82138636
 
 
-def frequency_test(bit_sequence: str) -> bool:
+def frequency_test(bit_sequence: str) -> (bool, float):
     n = len(bit_sequence)
     s = (bit_sequence.count('1') - bit_sequence.count('0')) / sqrt(n)
 
-    return s <= QUANTILE
+    return s <= QUANTILE, s
 
 
-def identical_bits_test(bit_sequence: str) -> bool:
+def identical_bits_test(bit_sequence: str) -> (bool, float, float, float):
     n = len(bit_sequence)
     p = bit_sequence.count('1') / n
+
+    # TODO: try to fix counting
     v = 1 + count_nonzero([lambda k: bit_sequence[k] != bit_sequence[k + 1] for i in range(n - 1)])
 
     s = abs(v - 2 * n * p * (1 - p)) / (2 * p * (1 - p) * sqrt(2 * n))
 
-    return s <= QUANTILE
+    return s <= QUANTILE, p, v, s
 
 
-def arbitrary_deviations_test(bit_sequence: str) -> bool:
+def arbitrary_deviations_test(bit_sequence: str) -> (bool, List[float], int):
     n = len(bit_sequence)
     sequence = [2 * int(x) - 1 for x in bit_sequence]
 
@@ -30,7 +34,7 @@ def arbitrary_deviations_test(bit_sequence: str) -> bool:
         s.append(s[i] + sequence[i])
     s.append(0)
 
-    l = n + 2 - count_nonzero(s)
+    l = count_nonzero(array(s) == 0) - 1
 
     y = []
     for j in range(-9, 10):
@@ -39,4 +43,4 @@ def arbitrary_deviations_test(bit_sequence: str) -> bool:
         e = s.count(j)
         y.append(abs(e - l) / sqrt(2 * l * (abs(j) * 4 - 2)))
 
-    return count_nonzero([x <= QUANTILE for x in y]) == 18
+    return count_nonzero(array(y) > QUANTILE) == 0, y, l

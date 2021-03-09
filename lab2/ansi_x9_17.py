@@ -1,19 +1,17 @@
-from sys import byteorder
-from time import time
-from struct import unpack
-from itertools import islice
-from Cryptodome.Cipher import DES3
-from Cryptodome.Util.strxor import strxor
+from time import time_ns
 from typing import List
+from itertools import islice
+from Cryptodome.Cipher import DES3, DES
+from Cryptodome.Util.strxor import strxor
 
 
 def str_to_bytes(s: str) -> bytes:
-    return s.encode('UTF-8')
+    return s.encode('ascii')
 
 
 def get_8_byte_time() -> bytes:
-    t = int(time() * 10 ** 6)
-    return str_to_bytes(hex(t)[-8:])
+    t = hex(time_ns())
+    return str_to_bytes(t[-8:])
 
 
 def ansi_x9_17(key: bytes, s: bytes) -> bytes:
@@ -33,14 +31,14 @@ def generate_sequence(key1: str, key2: str, seed: str, m: int) -> List[bytes]:
     return [x for x in islice(ansi_x9_17(key, s), m)]
 
 
-def convert_to_dec_and_bin(sequence: List[bytes]) -> (str, str):
-    sequence_str_dec = ''
+def convert_to_bin_and_hex(sequence: List[bytes]) -> (str, str):
     sequence_str_bin = ''
+    sequence_str_hex = ''
 
-    for item in sequence:
-        # 'Q' means unsigned long long in C (8 bytes)
-        sequence_str_dec += str(unpack('Q', item)[0])
+    for block in sequence:
+        h = block.hex()
+        sequence_str_hex += h
         # slice to remove '0b'
-        sequence_str_bin += bin(int.from_bytes(item, byteorder=byteorder))[2:]
+        sequence_str_bin += bin(int(h, 16))[2:].zfill(64)
 
-    return sequence_str_bin, sequence_str_dec
+    return sequence_str_bin, sequence_str_hex
