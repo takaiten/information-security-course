@@ -17,8 +17,7 @@ def identical_bits_test(bit_sequence: str) -> (bool, float, float, float):
     n = len(bit_sequence)
     p = bit_sequence.count('1') / n
 
-    # TODO: try to fix counting
-    v = 1 + count_nonzero([lambda k: bit_sequence[k] != bit_sequence[k + 1] for i in range(n - 1)])
+    v = 1 + sum([bit_sequence[k] != bit_sequence[k + 1] for k in range(n - 1)])
 
     s = abs(v - 2 * n * p * (1 - p)) / (2 * p * (1 - p) * sqrt(2 * n))
 

@@ -3,24 +3,27 @@ from lab2.statistical_tests import *
 
 import PySimpleGUI as sg
 
+DEFAULT_KEY1 = '12345678'
+DEFAULT_KEY2 = '87654321'
+DEFAULT_SEED = 'examples'
+DEFAULT_BLOCKS = 2
+
+DEFAULT_FRAME_PAD = (7, 7)
+DEFAULT_TEXT_SIZE = (11, 1)
+
 
 def create_default_input(text, key, input_type=sg.Input):
-    return [sg.Text(text, size=(11, 1)), input_type(key=key, disabled=True)]
+    return [sg.Text(text, DEFAULT_TEXT_SIZE), input_type(key=key, disabled=True)]
 
-
-default_key1 = '12345678'
-default_key2 = '87654321'
-default_seed = 'examples'
-default_blocks = 2
 
 sg.theme('Reddit')
 
 main_layout = [
-    [sg.Text('Key1:', size=(7, 1)), sg.Input(key='key1', default_text=default_key1)],
-    [sg.Text('Key2:', size=(7, 1)), sg.Input(key='key2', default_text=default_key2)],
-    [sg.Text('Seed:', size=(7, 1)), sg.Input(key='seed', default_text=default_seed)],
-    [sg.Text('Blocks:', size=(7, 1)), sg.Input(key='blocks', default_text=default_blocks)],
-    [sg.Button('Generate', key='generate', pad=(81, 5))],
+    [sg.Text('Key1:', size=(7, 1)), sg.Input(key='key1', default_text=DEFAULT_KEY1)],
+    [sg.Text('Key2:', size=(7, 1)), sg.Input(key='key2', default_text=DEFAULT_KEY2)],
+    [sg.Text('Seed:', size=(7, 1)), sg.Input(key='seed', default_text=DEFAULT_SEED)],
+    [sg.Text('Blocks:', size=(7, 1)), sg.Input(key='blocks', default_text=DEFAULT_BLOCKS)],
+    [sg.Button('Generate', key='generate')],
 ]
 
 sequence_layout = [
@@ -47,21 +50,22 @@ test3_layout = [
 ]
 
 layout1 = [
-    [sg.Frame('Generate ANSI X9.17', main_layout, key='frame1')],
-    [sg.Frame('Sequence', sequence_layout, key='frame2')],
+    [sg.Frame('Generate ANSI X9.17', main_layout, key='frame1', pad=DEFAULT_FRAME_PAD, element_justification='center')],
+    [sg.Frame('Sequence', sequence_layout, key='frame2', pad=DEFAULT_FRAME_PAD)],
 ]
 
 layout2 = [
-    [sg.Frame('Frequency test', test1_layout, key='frame3')],
-    [sg.Frame('Identical bits test', test2_layout, key='frame4')],
-    [sg.Frame('Arbitrary deviations test', test3_layout, key='frame5')],
+    [sg.Frame('Frequency test', test1_layout, key='frame3', pad=DEFAULT_FRAME_PAD)],
+    [sg.Frame('Identical bits test', test2_layout, key='frame4', pad=DEFAULT_FRAME_PAD)],
+    [sg.Frame('Arbitrary deviations test', test3_layout, key='frame5', pad=DEFAULT_FRAME_PAD)],
 ]
 
 layout = [
-    [sg.Frame('Generation', layout1, key='generation'), sg.Frame('Tests', layout2, key='tests')]
+    [sg.Frame('Generation', layout1, key='generation', pad=DEFAULT_FRAME_PAD, border_width=3),
+     sg.Frame('Tests', layout2, key='tests', pad=DEFAULT_FRAME_PAD, border_width=3)]
 ]
 
-window = sg.Window('ANSI X9.17', layout, size=(1450, 550), font=('Fira Code Retina', 10), finalize=True)
+window = sg.Window('ANSI X9.17', layout, size=(1500, 550), font=('Fira Code Retina', 10), finalize=True)
 
 
 def set_expand_true(keys: List[str]):
