@@ -45,8 +45,8 @@ test2_layout = [
 
 test3_layout = [
     create_default_input('Result', 'test3_result'),
-    create_default_input('S', 'test3_s', sg.Multiline),
     create_default_input('L:', 'test3_l'),
+    create_default_input('Statistics:', 'test3_s', sg.Multiline),
 ]
 
 layout1 = [
@@ -108,6 +108,14 @@ def format_float_array(arr: List[float]) -> str:
     return '[' + ', '.join(new_arr[:n]) + '\n ' + ', '.join(new_arr[n:]) + ']'
 
 
+def update_window(keys: List[str], fields_values: List[any]):
+    if len(keys) != len(fields_values):
+        return
+
+    for k, v in zip(keys, fields_values):
+        window[k].update(str(v))
+
+
 while True:  # Event Loop
     event, values = window.read()
 
@@ -124,20 +132,14 @@ while True:  # Event Loop
         sequence = generate_sequence(key1, key2, seed, m)
         sequence_bin, sequence_hex = convert_to_bin_and_hex(sequence)
 
-        window['hex'].update(sequence_hex)
-        window['bin'].update(sequence_bin)
+        update_window(['hex', 'bin'], [sequence_hex, sequence_bin])
 
-        frequency_test_result = frequency_test(sequence_bin)
-        window['test1_result'].update(frequency_test_result[0])
-        window['test1_stat'].update(frequency_test_result[1])
+        frequency_test_result = list(frequency_test(sequence_bin))
+        update_window(['test1_result', 'test1_stat'], frequency_test_result)
 
-        identical_bits_test_result = identical_bits_test(sequence_bin)
-        window['test2_result'].update(identical_bits_test_result[0])
-        window['test2_pi'].update(identical_bits_test_result[1])
-        window['test2_v'].update(identical_bits_test_result[2])
-        window['test2_stat'].update(identical_bits_test_result[3])
+        identical_bits_test_result = list(identical_bits_test(sequence_bin))
+        update_window(['test2_result', 'test2_pi', 'test2_v', 'test2_stat'], identical_bits_test_result)
 
-        arbitrary_deviations_test_result = arbitrary_deviations_test(sequence_bin)
-        window['test3_result'].update(arbitrary_deviations_test_result[0])
-        window['test3_s'].update(format_float_array(arbitrary_deviations_test_result[1]))
-        window['test3_l'].update(arbitrary_deviations_test_result[2])
+        arbitrary_deviations_test_result = list(arbitrary_deviations_test(sequence_bin))
+        arbitrary_deviations_test_result[1] = format_float_array(arbitrary_deviations_test_result[1])
+        update_window(['test3_result', 'test3_s', 'test3_l'], arbitrary_deviations_test_result)
