@@ -23,7 +23,7 @@ main_layout = [
     [sg.Text('Key2:', size=(7, 1)), sg.Input(key='key2', default_text=DEFAULT_KEY2)],
     [sg.Text('Seed:', size=(7, 1)), sg.Input(key='seed', default_text=DEFAULT_SEED)],
     [sg.Text('Blocks:', size=(7, 1)), sg.Input(key='blocks', default_text=DEFAULT_BLOCKS)],
-    [sg.Button('Generate', key='generate')],
+    [sg.Button('Generate', key='generate'), sg.Button('Save', key='save')],
 ]
 
 sequence_layout = [
@@ -116,11 +116,19 @@ def update_window(keys: List[str], fields_values: List[any]):
         window[k].update(str(v))
 
 
+def save_to_file(values):
+    with open('result.txt', 'w') as f:
+        f.write(values['bin'])
+
+
 while True:  # Event Loop
     event, values = window.read()
 
     if event in (sg.WINDOW_CLOSED, 'Quit'):  # if all windows were closed
         break
+    elif event == 'save':
+        if values['bin']:
+            save_to_file(values)
     elif event == 'generate':
         if validate_fields(values):
             continue

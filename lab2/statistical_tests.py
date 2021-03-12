@@ -1,6 +1,4 @@
 from typing import List
-
-# import numpy as np
 from numpy import sqrt, count_nonzero, array
 
 QUANTILE = 1.82138636
