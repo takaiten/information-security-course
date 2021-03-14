@@ -3,6 +3,7 @@ from lab2.statistical_tests import *
 
 import PySimpleGUI as sg
 
+EMPTY_STR = ''
 DEFAULT_KEY1 = '12345678'
 DEFAULT_KEY2 = '87654321'
 DEFAULT_SEED = 'examples'
@@ -10,6 +11,7 @@ DEFAULT_BLOCKS = 2
 
 DEFAULT_FRAME_PAD = (7, 7)
 DEFAULT_TEXT_SIZE = (11, 1)
+DEFAULT_BUTTON_SIZE = (10, 1)
 
 
 def create_default_input(text, key, input_type=sg.Input):
@@ -23,7 +25,10 @@ main_layout = [
     [sg.Text('Key2:', size=(7, 1)), sg.Input(key='key2', default_text=DEFAULT_KEY2)],
     [sg.Text('Seed:', size=(7, 1)), sg.Input(key='seed', default_text=DEFAULT_SEED)],
     [sg.Text('Blocks:', size=(7, 1)), sg.Input(key='blocks', default_text=DEFAULT_BLOCKS)],
-    [sg.Button('Generate', key='generate'), sg.Button('Save', key='save')],
+    [sg.Text('File:', size=(7, 1)), sg.Input(key='file', default_text=EMPTY_STR, disabled=True),
+     sg.FileBrowse(key='browse', file_types=(("TXT", "*.txt"),), size=DEFAULT_BUTTON_SIZE)],
+    [sg.Button('Generate', key='generate', size=DEFAULT_BUTTON_SIZE),
+     sg.Button('Save', key='save', size=DEFAULT_BUTTON_SIZE)],
 ]
 
 sequence_layout = [
@@ -50,7 +55,7 @@ test3_layout = [
 ]
 
 layout1 = [
-    [sg.Frame('Generate ANSI X9.17', main_layout, key='frame1', pad=DEFAULT_FRAME_PAD, element_justification='center')],
+    [sg.Frame('Generate ANSI X9.17', main_layout, key='frame1', pad=DEFAULT_FRAME_PAD, element_justification='right')],
     [sg.Frame('Sequence', sequence_layout, key='frame2', pad=DEFAULT_FRAME_PAD)],
 ]
 
@@ -65,7 +70,7 @@ layout = [
      sg.Frame('Tests', layout2, key='tests', pad=DEFAULT_FRAME_PAD, border_width=3)]
 ]
 
-window = sg.Window('ANSI X9.17', layout, size=(1500, 550), font=('Fira Code Retina', 10), finalize=True)
+window = sg.Window('ANSI X9.17', layout, size=(1600, 550), font=('Fira Code Retina', 10), finalize=True)
 
 
 def set_expand_true(keys: List[str]):
@@ -73,7 +78,7 @@ def set_expand_true(keys: List[str]):
         window[key].expand(expand_x=True, expand_y=True)
 
 
-set_expand_true(['key1', 'key2', 'seed', 'blocks', 'hex', 'bin',
+set_expand_true(['key1', 'key2', 'seed', 'blocks', 'file', 'hex', 'bin',
                  'test1_result', 'test1_stat',
                  'test2_result', 'test2_pi', 'test2_v', 'test2_stat',
                  'test3_result', 'test3_s', 'test3_l',
@@ -97,7 +102,7 @@ def validate_fields(fields) -> bool:
     has_errors = len(errors) != 0
 
     if has_errors:
-        sg.popup_error('\n'.join(errors))
+        sg.popup_error('\n'.join(errors), title='Error', auto_close=True, auto_close_duration=5)
 
     return has_errors
 
@@ -116,9 +121,13 @@ def update_window(keys: List[str], fields_values: List[any]):
         window[k].update(str(v))
 
 
-def save_to_file(values):
-    with open('result.txt', 'w') as f:
-        f.write(values['bin'])
+def save_to_file(filename: str, values_to_save: dict):
+    with open(filename, 'w') as f:
+        f.writelines([f'{key}: {value}\n' for key, value in values_to_save.items()])
+
+
+def is_empty_field(field: str) -> bool:
+    return len(field) == 0 or field.isspace()
 
 
 while True:  # Event Loop
@@ -127,8 +136,17 @@ while True:  # Event Loop
     if event in (sg.WINDOW_CLOSED, 'Quit'):  # if all windows were closed
         break
     elif event == 'save':
-        if values['bin']:
-            save_to_file(values)
+        if not is_empty_field(values['bin']) and not is_empty_field(values['file']):
+            save_to_file(values['file'], {'key1': values['key1'],
+                                          'key2': values['key2'],
+                                          'seed': values['seed'],
+                                          'blocks': values['blocks'],
+                                          'bin': values['bin']})
+            sg.popup('Sequence successfully saved to file!',
+                     title='Success', auto_close=True, auto_close_duration=5)
+        else:
+            sg.popup_error('You must select file and generate sequence!',
+                           title='Error', auto_close=True, auto_close_duration=5)
     elif event == 'generate':
         if validate_fields(values):
             continue
