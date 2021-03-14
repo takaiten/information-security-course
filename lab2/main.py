@@ -36,20 +36,24 @@ sequence_layout = [
     [sg.Text('Bin:', size=(4, 1)), sg.Multiline(key='bin', disabled=True)],
 ]
 
+quantile_layout = [
+    create_default_input('Quantile:', 'quantile')
+]
+
 test1_layout = [
-    create_default_input('Result', 'test1_result'),
+    create_default_input('Result:', 'test1_result'),
     create_default_input('Statistics:', 'test1_stat'),
 ]
 
 test2_layout = [
-    create_default_input('Result', 'test2_result'),
+    create_default_input('Result:', 'test2_result'),
     create_default_input('Pi:', 'test2_pi'),
     create_default_input('V:', 'test2_v'),
     create_default_input('Statistics:', 'test2_stat'),
 ]
 
 test3_layout = [
-    create_default_input('Result', 'test3_result'),
+    create_default_input('Result:', 'test3_result'),
     create_default_input('L:', 'test3_l'),
     create_default_input('Statistics:', 'test3_s', sg.Multiline),
 ]
@@ -60,6 +64,7 @@ layout1 = [
 ]
 
 layout2 = [
+    [sg.Frame('Constants', quantile_layout, key='frame6', pad=DEFAULT_FRAME_PAD)],
     [sg.Frame('Frequency test', test1_layout, key='frame3', pad=DEFAULT_FRAME_PAD)],
     [sg.Frame('Identical bits test', test2_layout, key='frame4', pad=DEFAULT_FRAME_PAD)],
     [sg.Frame('Arbitrary deviations test', test3_layout, key='frame5', pad=DEFAULT_FRAME_PAD)],
@@ -78,11 +83,11 @@ def set_expand_true(keys: List[str]):
         window[key].expand(expand_x=True, expand_y=True)
 
 
-set_expand_true(['key1', 'key2', 'seed', 'blocks', 'file', 'hex', 'bin',
+set_expand_true(['key1', 'key2', 'seed', 'blocks', 'file', 'hex', 'bin', 'quantile',
                  'test1_result', 'test1_stat',
                  'test2_result', 'test2_pi', 'test2_v', 'test2_stat',
                  'test3_result', 'test3_s', 'test3_l',
-                 'frame1', 'frame2', 'frame3', 'frame4', 'frame5',
+                 'frame1', 'frame2', 'frame3', 'frame4', 'frame5', 'frame6',
                  'generation', 'tests'])
 
 
@@ -159,6 +164,8 @@ while True:  # Event Loop
         sequence_bin, sequence_hex = convert_to_bin_and_hex(sequence)
 
         update_window(['hex', 'bin'], [sequence_hex, sequence_bin])
+
+        update_window(['quantile'], [QUANTILE])
 
         frequency_test_result = list(frequency_test(sequence_bin))
         update_window(['test1_result', 'test1_stat'], frequency_test_result)
