@@ -55,6 +55,7 @@ test2_layout = [
 test3_layout = [
     create_default_input('Result:', 'test3_result'),
     create_default_input('L:', 'test3_l'),
+    create_default_input('Counts:', 'test3_e', sg.Multiline),
     create_default_input('Statistics:', 'test3_s', sg.Multiline),
 ]
 
@@ -75,7 +76,7 @@ layout = [
      sg.Frame('Tests', layout2, key='tests', pad=DEFAULT_FRAME_PAD, border_width=3)]
 ]
 
-window = sg.Window('ANSI X9.17', layout, size=(1600, 550), font=('Fira Code Retina', 10), finalize=True)
+window = sg.Window('ANSI X9.17', layout, size=(1600, 600), font=('Fira Code Retina', 10), finalize=True)
 
 
 def set_expand_true(keys: List[str]):
@@ -86,7 +87,7 @@ def set_expand_true(keys: List[str]):
 set_expand_true(['key1', 'key2', 'seed', 'blocks', 'file', 'hex', 'bin', 'quantile',
                  'test1_result', 'test1_stat',
                  'test2_result', 'test2_pi', 'test2_v', 'test2_stat',
-                 'test3_result', 'test3_s', 'test3_l',
+                 'test3_result', 'test3_e', 'test3_s', 'test3_l',
                  'frame1', 'frame2', 'frame3', 'frame4', 'frame5', 'frame6',
                  'generation', 'tests'])
 
@@ -115,6 +116,12 @@ def validate_fields(fields) -> bool:
 def format_float_array(arr: List[float]) -> str:
     new_arr = list(map(lambda x: f'{x:.3f}', arr))
     n = int(len(new_arr) / 2)
+    return '[' + ', '.join(new_arr[:n]) + '\n ' + ', '.join(new_arr[n:]) + ']'
+
+
+def format_int_array(arr: List[int]) -> str:
+    new_arr = list(map(lambda x: f'{x}', arr))
+    n = int(len(arr) / 2)
     return '[' + ', '.join(new_arr[:n]) + '\n ' + ', '.join(new_arr[n:]) + ']'
 
 
@@ -174,5 +181,6 @@ while True:  # Event Loop
         update_window(['test2_result', 'test2_pi', 'test2_v', 'test2_stat'], identical_bits_test_result)
 
         arbitrary_deviations_test_result = list(arbitrary_deviations_test(sequence_bin))
-        arbitrary_deviations_test_result[1] = format_float_array(arbitrary_deviations_test_result[1])
-        update_window(['test3_result', 'test3_s', 'test3_l'], arbitrary_deviations_test_result)
+        arbitrary_deviations_test_result[1] = format_int_array(arbitrary_deviations_test_result[1])
+        arbitrary_deviations_test_result[2] = format_float_array(arbitrary_deviations_test_result[2])
+        update_window(['test3_result', 'test3_e', 'test3_s', 'test3_l'], arbitrary_deviations_test_result)

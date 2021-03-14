@@ -22,7 +22,7 @@ def identical_bits_test(bit_sequence: str) -> (bool, float, float, float):
     return s <= QUANTILE, p, v, s
 
 
-def arbitrary_deviations_test(bit_sequence: str) -> (bool, List[float], int):
+def arbitrary_deviations_test(bit_sequence: str) -> (bool, List[int], List[float], int):
     n = len(bit_sequence)
     sequence = [2 * int(x) - 1 for x in bit_sequence]
 
@@ -33,11 +33,11 @@ def arbitrary_deviations_test(bit_sequence: str) -> (bool, List[float], int):
 
     l = count_nonzero(array(s) == 0) - 1
 
-    y = []
+    e, y = [], []
     for j in range(-9, 10):
         if j == 0:
             continue
-        e = s.count(j)
-        y.append(abs(e - l) / sqrt(2 * l * (abs(j) * 4 - 2)))
+        e.append(s.count(j))
+        y.append(abs(e[-1] - l) / sqrt(2 * l * (abs(j) * 4 - 2)))
 
-    return count_nonzero(array(y) > QUANTILE) == 0, y, l
+    return count_nonzero(array(y) > QUANTILE) == 0, e, y, l
