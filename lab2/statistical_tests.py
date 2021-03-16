@@ -6,7 +6,7 @@ QUANTILE = 1.82138636
 
 def frequency_test(bit_sequence: str) -> (bool, float):
     n = len(bit_sequence)
-    s = (bit_sequence.count('1') - bit_sequence.count('0')) / sqrt(n)
+    s = abs(bit_sequence.count('1') - bit_sequence.count('0')) / sqrt(n)
 
     return s <= QUANTILE, s
 
