@@ -1,4 +1,5 @@
 from Cryptodome.Cipher import DES3, DES, AES, Blowfish, PKCS1_OAEP
+from Cryptodome.Signature import pss
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Hash import SHA256, MD5, RIPEMD160
 
@@ -43,19 +44,25 @@ def handle_pkcs1(data: bytes, key: bytes, mode='encrypt'):
     return getattr(pkcs1, mode)(data)
 
 
-def sha256_hash(data: bytes):
+def signature_pss(data: bytes, key: bytes):
+    rsa_key = RSA.importKey(key)
+    sha_hash = SHA256.new(data)
+    return pss.new(rsa_key).sign(sha_hash)
+
+
+def hash_sha256(data: bytes):
     sha = SHA256.new()
     sha.update(data)
     return sha.hexdigest()
 
 
-def md5_hash(data: bytes):
+def hash_md5(data: bytes):
     md5 = MD5.new()
     md5.update(data)
     return md5.hexdigest()
 
 
-def ripemd160_hash(data: bytes):
+def hash_ripemd160(data: bytes):
     ripemd160 = RIPEMD160.new()
     ripemd160.update(data)
     return ripemd160.hexdigest()
