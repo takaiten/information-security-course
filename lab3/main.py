@@ -9,13 +9,9 @@ ALLOWED_FILE_TYPES = (('Text files', '*.txt'),)
 DEFAULT_FRAME_PAD = (7, 7)
 
 SYMMETRIC = {'DES': handle_des, 'AES': handle_aes, 'Blowfish': handle_blowfish}
-
 ASYMMETRIC = {'PKCS1 OAEP': handle_pkcs1_oaep}
-
 CIPHERING = reduce(lambda x, y: dict(x, **y), (SYMMETRIC, ASYMMETRIC))
-
 SIGNATURE = {'PSS': signature_pss}
-
 HASH = {'SHA256': hash_sha256, 'MD5': hash_md5, 'Ripemd160': hash_ripemd160}
 
 
@@ -26,11 +22,11 @@ def get_default_algorithm(algorithms: dict):
 #  ### DEFINE LAYOUTS ### #
 
 symmetric_layout = [
-    [sg.Radio(x, 'ciphering', key=x, default=x == get_default_algorithm(SYMMETRIC)) for x in SYMMETRIC.keys()]
+    [sg.Radio(x, 'ciphering', key=x, default=x == get_default_algorithm(CIPHERING)) for x in SYMMETRIC.keys()]
 ]
 
 asymmetric_layout = [
-    [sg.Radio(x, 'ciphering', key=x, default=x == get_default_algorithm(ASYMMETRIC)) for x in ASYMMETRIC.keys()]
+    [sg.Radio(x, 'ciphering', key=x) for x in ASYMMETRIC.keys()]
 ]
 
 ciphering_layout = [
@@ -42,15 +38,11 @@ ciphering_layout = [
     [sg.Input(key='-KEY_PATH-'), sg.FileBrowse('Select file with key', file_types=ALLOWED_FILE_TYPES)],
     [sg.Input(key='-CIPHERTEXT_PATH-'), sg.FileSaveAs('Select file with ciphertext', file_types=ALLOWED_FILE_TYPES)],
     [sg.Input(key='-PLAINTEXT_PATH-'), sg.FileSaveAs('Select file with plaintext', file_types=ALLOWED_FILE_TYPES)],
-    [sg.Button('Encrypt plaintext file', key='-ENCRYPT-', button_color=('white', 'red')),
-     sg.Button('Decrypt ciphertext file', key='-DECRYPT-', button_color=('white', 'red'))]
+    [sg.Button('Encrypt plaintext file', key='-ENCRYPT-', button_color=('white', 'darkred')),
+     sg.Button('Decrypt ciphertext file', key='-DECRYPT-', button_color=('white', 'green'))]
 ]
 
 signature_layout = [
-    [sg.Frame('Choose signature algorithm',
-              [[sg.Radio(x, 'signature', key=x, default=x == get_default_algorithm(SIGNATURE)) for x in SIGNATURE.keys()]],
-              border_width=3)],
-
     [sg.Input(key='-RSA_KEY_PATH-'), sg.FileBrowse('Select file with key', file_types=ALLOWED_FILE_TYPES)],
     [sg.Input(key='-SIGN_MESSAGE_PATH-'), sg.FileBrowse('Select file with message', file_types=ALLOWED_FILE_TYPES)],
     [sg.Input(key='-SIGN_PATH-'), sg.FileSaveAs('Select file with signature', file_types=ALLOWED_FILE_TYPES)],
@@ -107,7 +99,7 @@ def write_to_file(filepath: str, data: str):
 
 
 def validate_fields(values_dict: dict, required_fields=[]):
-    return [key for key in required_fields if len(values_dict[key].strip())] != required_fields
+    return reduce(lambda acc, key: acc & len(values_dict[key].strip()) > 0, required_fields, True)
 
 
 # ### CIPHERING ### #
@@ -149,10 +141,7 @@ def handle_ciphering(event_key: str, values_dict: dict):
 
 # ### SIGNATURE ### #
 
-def handle_signature(event_key: str, values_dict: dict):
-    if event_key != '-SIGN-':
-        raise ValueError(f'main.handle_signature: Unable to handle event: {event_key}')
-
+def handle_signature(values_dict: dict):
     [algorithm] = [k for k in SIGNATURE.keys() if values_dict[k]]
 
     data = read_from_file(values_dict['-SIGN_MESSAGE_PATH-'])
@@ -167,10 +156,7 @@ def handle_signature(event_key: str, values_dict: dict):
 
 # ### HASH ### #
 
-def handle_hash(event_key: str, values_dict: dict):
-    if event_key != '-HASH-':
-        raise ValueError(f'main.handle_hash: Unable to handle event: {event_key}')
-
+def handle_hash(values_dict: dict):
     [algorithm] = [k for k in HASH.keys() if values_dict[k]]
 
     data = read_from_file(values_dict['-HASH_MESSAGE_PATH-'])
@@ -190,22 +176,22 @@ while True:
     if event == sg.WIN_CLOSED:
         break
     elif event in ['-ENCRYPT-', '-DECRYPT-']:
-        if validate_fields(values, ['-PLAINTEXT_PATH-', '-CIPHERTEXT_PATH-', '-KEY_PATH-']):
+        if not validate_fields(values, ['-PLAINTEXT_PATH-', '-CIPHERTEXT_PATH-', '-KEY_PATH-']):
             error_popup('Please select all the files', title='Validation error')
             continue
 
         handle_ciphering(event, values)
     elif event == '-SIGN-':
-        if validate_fields(values, ['-RSA_KEY_PATH-', '-SIGN_MESSAGE_PATH-', '-SIGN_PATH-']):
+        if not validate_fields(values, ['-RSA_KEY_PATH-', '-SIGN_MESSAGE_PATH-', '-SIGN_PATH-']):
             error_popup('Please select all the files', title='Validation error')
             continue
 
-        handle_signature(event, values)
+        handle_signature(values)
     elif event == '-HASH-':
-        if validate_fields(values, ['-HASH_MESSAGE_PATH-', '-HASH_PATH-']):
+        if not validate_fields(values, ['-HASH_MESSAGE_PATH-', '-HASH_PATH-']):
             error_popup('Please select all the files', title='Validation error')
             continue
 
-        handle_hash(event, values)
+        handle_hash(values)
 
 window.close()
