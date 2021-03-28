@@ -57,7 +57,15 @@ def handle_pkcs1_oaep(data: bytes, key: bytes, mode='encrypt'):
 def signature_pss(data: bytes, key: bytes):
     rsa_key = RSA.importKey(key)
     sha_hash = SHA256.new(data)
+
     return pss.new(rsa_key).sign(sha_hash)
+
+
+def verify_signature_pss(data: bytes, key: bytes, signature: bytes):
+    rsa_key = RSA.importKey(key)
+    sha_hash = SHA256.new(data)
+
+    pss.new(rsa_key).verify(sha_hash, signature)
 
 
 def hash_sha256(data: bytes):

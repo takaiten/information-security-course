@@ -6,7 +6,7 @@ from lab3.crypto_utils import *
 
 sg.theme('Reddit')
 
-ALLOWED_FILE_TYPES = (('Text files', '*.txt'),)
+ALLOWED_FILE_TYPES = (('Text files', '*.txt'), ('Key files', '*.key'),)
 DEFAULT_FRAME_PAD = (7, 7)
 DEFAULT_BUTTON_SIZE = (19, 1)
 
@@ -59,7 +59,8 @@ signature_layout = [
     [sg.Input(key='-RSA_KEY_PATH-'), create_file_button('Select file with key')],
     [sg.Input(key='-SIGN_MESSAGE_PATH-'), create_file_button('Select file with message')],
     [sg.Input(key='-SIGN_PATH-'), create_file_button('Select file with signature', sg.FileSaveAs)],
-    [sg.Button('Sign message', key='-SIGN-', button_color=('white', 'darkred'), size=DEFAULT_BUTTON_SIZE)]
+    [sg.Button('Sign message', key='-SIGN-', button_color=('white', 'darkred'), size=DEFAULT_BUTTON_SIZE),
+     sg.Button('Verify', key='-VERIFY-', button_color=('white', 'green'), size=DEFAULT_BUTTON_SIZE)]
 ]
 
 # ### DEFINE TAB LAYOUTS ### #
@@ -154,11 +155,23 @@ def handle_signature(values_dict: dict):
     key = read_from_file(values_dict['-RSA_KEY_PATH-'])
 
     try:
-        result = get_default_algorithm(SIGNATURE)(encode_utf8(data), encode_utf8(key))
+        result = signature_pss(encode_utf8(data), encode_utf8(key))
         write_to_file(values_dict['-SIGN_PATH-'], bytes_to_hex(result))
         popup('Successfully created signature', title='Success')
     except TypeError or ValueError as error:
         error_popup(error, title='Signature error')
+
+
+def verify_signature(values_dict: dict):
+    data = read_from_file(values_dict['-SIGN_MESSAGE_PATH-'])
+    key = read_from_file(values_dict['-RSA_KEY_PATH-'])
+    signature = read_from_file(values_dict['-SIGN_PATH-'])
+
+    try:
+        verify_signature_pss(encode_utf8(data), encode_utf8(key), bytes_from_hex(signature))
+        popup('Signature verified', title='Success')
+    except ValueError as error:
+        error_popup(error, title="Couldn't verify signature")
 
 
 # ### HASH ### #
@@ -189,17 +202,23 @@ while True:
             continue
 
         handle_ciphering(event, values)
-    elif event == '-SIGN-':
-        if not validate_fields(values, ['-RSA_KEY_PATH-', '-SIGN_MESSAGE_PATH-', '-SIGN_PATH-']):
-            error_popup('Please select all the files', title='Validation error')
-            continue
-
-        handle_signature(values)
     elif event == '-HASH-':
         if not validate_fields(values, ['-HASH_MESSAGE_PATH-', '-HASH_PATH-']):
             error_popup('Please select all the files', title='Validation error')
             continue
 
         handle_hash(values)
+    elif event == '-SIGN-':
+        if not validate_fields(values, ['-RSA_KEY_PATH-', '-SIGN_MESSAGE_PATH-', '-SIGN_PATH-']):
+            error_popup('Please select all the files', title='Validation error')
+            continue
+
+        handle_signature(values)
+    elif event == '-VERIFY-':
+        if not validate_fields(values, ['-RSA_KEY_PATH-', '-SIGN_MESSAGE_PATH-', '-SIGN_PATH-']):
+            error_popup('Please select all the files', title='Validation error')
+            continue
+
+        verify_signature(values)
 
 window.close()
