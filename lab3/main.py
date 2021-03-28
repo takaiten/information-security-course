@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 from functools import reduce
+
 from lab3.bytes_utils import *
 from lab3.crypto_utils import *
 
@@ -7,16 +8,21 @@ sg.theme('Reddit')
 
 ALLOWED_FILE_TYPES = (('Text files', '*.txt'),)
 DEFAULT_FRAME_PAD = (7, 7)
+DEFAULT_BUTTON_SIZE = (19, 1)
 
 SYMMETRIC = {'DES': handle_des, 'AES': handle_aes, 'Blowfish': handle_blowfish}
 ASYMMETRIC = {'PKCS1 OAEP': handle_pkcs1_oaep}
 CIPHERING = reduce(lambda x, y: dict(x, **y), (SYMMETRIC, ASYMMETRIC))
-SIGNATURE = {'PSS': signature_pss}
 HASH = {'SHA256': hash_sha256, 'MD5': hash_md5, 'Ripemd160': hash_ripemd160}
+SIGNATURE = {'PSS': signature_pss}
 
 
 def get_default_algorithm(algorithms: dict):
     return list(algorithms.keys())[0]
+
+
+def create_file_button(title: str, button_type=sg.FileBrowse):
+    return button_type(title, file_types=ALLOWED_FILE_TYPES, size=DEFAULT_BUTTON_SIZE)
 
 
 #  ### DEFINE LAYOUTS ### #
@@ -30,41 +36,38 @@ asymmetric_layout = [
 ]
 
 ciphering_layout = [
-    [sg.Frame('Choose ciphering algorithm',
-              [[sg.Frame('Symmetric', symmetric_layout, key='generation', pad=DEFAULT_FRAME_PAD),
-                sg.Frame('Asymmetric', asymmetric_layout, key='tests', pad=DEFAULT_FRAME_PAD)]],
-              border_width=3)],
-
-    [sg.Input(key='-KEY_PATH-'), sg.FileBrowse('Select file with key', file_types=ALLOWED_FILE_TYPES)],
-    [sg.Input(key='-CIPHERTEXT_PATH-'), sg.FileSaveAs('Select file with ciphertext', file_types=ALLOWED_FILE_TYPES)],
-    [sg.Input(key='-PLAINTEXT_PATH-'), sg.FileSaveAs('Select file with plaintext', file_types=ALLOWED_FILE_TYPES)],
-    [sg.Button('Encrypt plaintext file', key='-ENCRYPT-', button_color=('white', 'darkred')),
-     sg.Button('Decrypt ciphertext file', key='-DECRYPT-', button_color=('white', 'green'))]
-]
-
-signature_layout = [
-    [sg.Input(key='-RSA_KEY_PATH-'), sg.FileBrowse('Select file with key', file_types=ALLOWED_FILE_TYPES)],
-    [sg.Input(key='-SIGN_MESSAGE_PATH-'), sg.FileBrowse('Select file with message', file_types=ALLOWED_FILE_TYPES)],
-    [sg.Input(key='-SIGN_PATH-'), sg.FileSaveAs('Select file with signature', file_types=ALLOWED_FILE_TYPES)],
-    [sg.Button('Sign message', key='-SIGN-', button_color=('white', 'red'))]
+    [sg.Frame('Symmetric', symmetric_layout, pad=DEFAULT_FRAME_PAD),
+     sg.Frame('Asymmetric', asymmetric_layout, pad=DEFAULT_FRAME_PAD)],
+    [sg.Input(key='-KEY_PATH-'), create_file_button('Select file with key')],
+    [sg.Input(key='-CIPHERTEXT_PATH-'), create_file_button('Select file with ciphertext', sg.FileSaveAs)],
+    [sg.Input(key='-PLAINTEXT_PATH-'), create_file_button('Select file with plaintext', sg.FileSaveAs)],
+    [sg.Button('Encrypt plaintext file', key='-ENCRYPT-', button_color=('white', 'darkred'), size=DEFAULT_BUTTON_SIZE),
+     sg.Button('Decrypt ciphertext file', key='-DECRYPT-', button_color=('white', 'green'), size=DEFAULT_BUTTON_SIZE)]
 ]
 
 hash_layout = [
-    [sg.Frame('Choose hash algorithm',
+    [sg.Frame('Hash algorithm',
               [[sg.Radio(x, 'hash', key=x, default=x == get_default_algorithm(HASH)) for x in HASH.keys()]],
               border_width=3)],
+    [sg.Input(key='-HASH_MESSAGE_PATH-'), create_file_button('Select file with message')],
+    [sg.Input(key='-HASH_PATH-'), create_file_button('Select file with hash', sg.FileSaveAs)],
+    [sg.Button('Hash message', key='-HASH-', button_color=('white', 'darkred'), size=DEFAULT_BUTTON_SIZE)]
+]
 
-    [sg.Input(key='-HASH_MESSAGE_PATH-'), sg.FileBrowse('Select file with message', file_types=ALLOWED_FILE_TYPES)],
-    [sg.Input(key='-HASH_PATH-'), sg.FileSaveAs('Select file with hash', file_types=ALLOWED_FILE_TYPES)],
-    [sg.Button('Hash message', key='-HASH-', button_color=('white', 'red'))]
+signature_layout = [
+    [sg.Text('Signature PKCS#1 PSS (RSA)')],
+    [sg.Input(key='-RSA_KEY_PATH-'), create_file_button('Select file with key')],
+    [sg.Input(key='-SIGN_MESSAGE_PATH-'), create_file_button('Select file with message')],
+    [sg.Input(key='-SIGN_PATH-'), create_file_button('Select file with signature', sg.FileSaveAs)],
+    [sg.Button('Sign message', key='-SIGN-', button_color=('white', 'darkred'), size=DEFAULT_BUTTON_SIZE)]
 ]
 
 # ### DEFINE TAB LAYOUTS ### #
 
 tab_group_layout = [[
     sg.Tab('Ciphering', ciphering_layout, key='-TAB1-'),
-    sg.Tab('Signature', signature_layout, key='-TAB2-'),
-    sg.Tab('Hash', hash_layout, key='-TAB3-'),
+    sg.Tab('Hash', hash_layout, key='-TAB2-'),
+    sg.Tab('Signature', signature_layout, key='-TAB3-'),
 ]]
 
 layout = [[
@@ -73,11 +76,15 @@ layout = [[
 
 window = sg.Window('LAB3', layout, no_titlebar=False)
 
-
 # ### METHODS ### #
+
 
 def error_popup(text: str, *args, **kwargs):
     sg.popup_error(text, auto_close=True, auto_close_duration=5, *args, **kwargs)
+
+
+def popup(text: str, *args, **kwargs):
+    sg.popup(text, auto_close=True, auto_close_duration=5, *args, **kwargs)
 
 
 def read_from_file(filepath: str):
@@ -99,7 +106,7 @@ def write_to_file(filepath: str, data: str):
 
 
 def validate_fields(values_dict: dict, required_fields=[]):
-    return reduce(lambda acc, key: acc & len(values_dict[key].strip()) > 0, required_fields, True)
+    return reduce(lambda acc, key: acc & (len(values_dict[key].strip()) > 0), required_fields, True)
 
 
 # ### CIPHERING ### #
@@ -135,6 +142,7 @@ def handle_ciphering(event_key: str, values_dict: dict):
     try:
         result = CIPHERING[algorithm](convert_input(data), encode_utf8(key), mode)
         write_to_file(save_path, convert_output(result))
+        popup(f'Successfully {mode}ed', title='Success')
     except TypeError or ValueError as error:
         error_popup(error, title='Ciphering error')
 
@@ -142,14 +150,13 @@ def handle_ciphering(event_key: str, values_dict: dict):
 # ### SIGNATURE ### #
 
 def handle_signature(values_dict: dict):
-    [algorithm] = [k for k in SIGNATURE.keys() if values_dict[k]]
-
     data = read_from_file(values_dict['-SIGN_MESSAGE_PATH-'])
     key = read_from_file(values_dict['-RSA_KEY_PATH-'])
 
     try:
-        result = SIGNATURE[algorithm](encode_utf8(data), encode_utf8(key))
+        result = get_default_algorithm(SIGNATURE)(encode_utf8(data), encode_utf8(key))
         write_to_file(values_dict['-SIGN_PATH-'], bytes_to_hex(result))
+        popup('Successfully created signature', title='Success')
     except TypeError or ValueError as error:
         error_popup(error, title='Signature error')
 
@@ -164,6 +171,7 @@ def handle_hash(values_dict: dict):
     try:
         result = HASH[algorithm](encode_utf8(data))
         write_to_file(values_dict['-HASH_PATH-'], result)
+        popup('Successfully hashed', title='Success')
     except TypeError or ValueError as error:
         error_popup(error, title='Hash error')
 
@@ -172,7 +180,7 @@ def handle_hash(values_dict: dict):
 
 while True:
     event, values = window.read()  # type: str, dict
-    print(event, values)
+
     if event == sg.WIN_CLOSED:
         break
     elif event in ['-ENCRYPT-', '-DECRYPT-']:
