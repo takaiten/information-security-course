@@ -1,33 +1,43 @@
 import PySimpleGUI as sg
-from utils import *
+from functools import reduce
+from lab3.bytes_utils import *
+from lab3.crypto_utils import *
 
 sg.theme('Reddit')
 
 ALLOWED_FILE_TYPES = (('Text files', '*.txt'),)
+DEFAULT_FRAME_PAD = (7, 7)
+
 SYMMETRIC = {'DES': handle_des, 'AES': handle_aes, 'Blowfish': handle_blowfish}
 DEFAULT_SYMMETRIC = list(SYMMETRIC.keys())[0]
 
+ASYMMETRIC = {'PKCS1 OAEP': handle_pkcs1_oaep}
+DEFAULT_ASYMMETRIC = list(SYMMETRIC.keys())[0]
 
-def error_popup(text: str, *args, **kwargs):
-    sg.popup_error(text, auto_close=True, auto_close_duration=5, *args, **kwargs)
+CIPHERING = reduce(lambda x, y: dict(x, **y), (SYMMETRIC, ASYMMETRIC))
 
 
-## Define layouts ##
+#  ### DEFINE LAYOUTS ### #
+
 symmetric_layout = [
-    # [sg.Text('Choose symmetric algorithm')],
-    # [sg.Radio(x, 'algorithm', key=x, default=x == 'DES') for x in ['DES', 'AES', 'Blowfish']],
-    [sg.Frame('Choose symmetric algorithm',
-              [[sg.Radio(x, 'algorithm', key=x, default=x == DEFAULT_SYMMETRIC) for x in SYMMETRIC.keys()]])],
+    [sg.Radio(x, 'algorithm', key=x, default=x == DEFAULT_SYMMETRIC) for x in SYMMETRIC.keys()]
+]
+
+asymmetric_layout = [
+    [sg.Radio(x, 'algorithm', key=x, default=x == DEFAULT_ASYMMETRIC) for x in ASYMMETRIC.keys()]
+]
+
+ciphering_layout = [
+    [sg.Frame('Choose ciphering algorithm',
+              [[sg.Frame('Symmetric', symmetric_layout, key='generation', pad=DEFAULT_FRAME_PAD),
+                sg.Frame('Asymmetric', asymmetric_layout, key='tests', pad=DEFAULT_FRAME_PAD)]],
+              border_width=3)],
+
     [sg.Input(key='-KEY_PATH-'), sg.FileBrowse('Select file with key', file_types=ALLOWED_FILE_TYPES)],
     [sg.Input(key='-CIPHERTEXT_PATH-'), sg.FileSaveAs('Select file with ciphertext', file_types=ALLOWED_FILE_TYPES)],
     [sg.Input(key='-PLAINTEXT_PATH-'), sg.FileSaveAs('Select file with plaintext', file_types=ALLOWED_FILE_TYPES)],
     [sg.Button('Encrypt plaintext file', key='-ENCRYPT-', button_color=('white', 'red')),
      sg.Button('Decrypt ciphertext file', key='-DECRYPT-', button_color=('white', 'red'))]
-]
-
-asymmetric_layout = [
-    [sg.FileSaveAs('Select file with ciphertext')],
-    [sg.FileSaveAs('Select file with plaintext')]
 ]
 
 signature_layout = [
@@ -38,12 +48,12 @@ hash_layout = [
 
 ]
 
-## Define tab layouts ##
+# ### DEFINE TAB LAYOUTS ### #
+
 tab_group_layout = [[
-    sg.Tab('Symmetric', symmetric_layout, key='-TAB1-'),
-    sg.Tab('Asymmetric', asymmetric_layout, key='-TAB2-'),
-    sg.Tab('Signature', signature_layout, key='-TAB3-'),
-    sg.Tab('Hash', hash_layout, key='-TAB4-'),
+    sg.Tab('Ciphering', ciphering_layout, key='-TAB1-'),
+    sg.Tab('Signature', signature_layout, key='-TAB2-'),
+    sg.Tab('Hash', hash_layout, key='-TAB3-'),
 ]]
 
 layout = [[
@@ -51,6 +61,12 @@ layout = [[
 ]]
 
 window = sg.Window('LAB3', layout, no_titlebar=False)
+
+
+# ### METHODS ### #
+
+def error_popup(text: str, *args, **kwargs):
+    sg.popup_error(text, auto_close=True, auto_close_duration=5, *args, **kwargs)
 
 
 def read_from_file(filepath: str):
@@ -62,7 +78,8 @@ def read_from_file(filepath: str):
 
 
 def write_to_file(filepath: str, data: str):
-    if data is None: return
+    if data is None:
+        return
     try:
         with open(filepath, 'w+') as f:
             f.write(data)
@@ -74,28 +91,41 @@ def validate_fields(values_dict: dict, required_fields=[]):
     return [key for key in required_fields if len(values_dict[key].strip())] != required_fields
 
 
-def handle_symmetric(event_key: str, values_dict: dict):
+# ### CIPHERING ### #
+
+def config_ciphering_params(event_key: str, values_dict: dict):
+    """
+    Configure parameters for ciphering
+    :param event_key: name of GUI event
+    :param values_dict: GUI values dictionary
+    :return: input data file path,
+             output data file path,
+             mode (encrypt or decrypt),
+             function to convert input data,
+             function to convert output data
+    """
     if event_key == '-ENCRYPT-':
-        input_path = values_dict['-PLAINTEXT_PATH-']
-        save_path = values_dict['-CIPHERTEXT_PATH-']
-        mode = 'encrypt'
+        return (values_dict['-PLAINTEXT_PATH-'], values_dict['-CIPHERTEXT_PATH-'],
+                'encrypt', encode_utf8, bytes_to_hex)
     elif event_key == '-DECRYPT-':
-        input_path = values_dict['-CIPHERTEXT_PATH-']
-        save_path = values_dict['-PLAINTEXT_PATH-']
-        mode = 'decrypt'
+        return (values_dict['-CIPHERTEXT_PATH-'], values_dict['-PLAINTEXT_PATH-'],
+                'decrypt', bytes_from_hex, decode_utf8)
     else:
-        return
+        raise ValueError(f'main.config_ciphering_params: Unable to handle event: {event_key}')
 
-    [algorithm] = [k for k in SYMMETRIC.keys() if values_dict[k]]
 
-    key = read_from_file(values_dict['-KEY_PATH-']).encode('UTF-8')
+def handle_ciphering(event_key: str, values_dict: dict):
+    input_path, save_path, mode, convert_input, convert_output = config_ciphering_params(event_key, values_dict)
+    [algorithm] = [k for k in CIPHERING.keys() if values_dict[k]]
+
     data = read_from_file(input_path)
+    key = encode_utf8(read_from_file(values_dict['-KEY_PATH-']))
 
     try:
-        result = SYMMETRIC[algorithm](data.encode('UTF-8') if mode == 'encrypt' else bytes.fromhex(data), key, mode)
-        write_to_file(save_path, result.hex() if mode == 'encrypt' else result.decode('UTF-8'))
+        result = CIPHERING[algorithm](convert_input(data), key, mode)
+        write_to_file(save_path, convert_output(result))
     except TypeError or ValueError as error:
-        error_popup(error, title='Symmetric error')
+        error_popup(error, title='Ciphering error')
 
 
 while True:
@@ -108,6 +138,6 @@ while True:
             error_popup('Please select all the files', title='Validation error')
             continue
 
-        handle_symmetric(event, values)
+        handle_ciphering(event, values)
 
 window.close()
