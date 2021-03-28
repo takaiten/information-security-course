@@ -9,22 +9,28 @@ ALLOWED_FILE_TYPES = (('Text files', '*.txt'),)
 DEFAULT_FRAME_PAD = (7, 7)
 
 SYMMETRIC = {'DES': handle_des, 'AES': handle_aes, 'Blowfish': handle_blowfish}
-DEFAULT_SYMMETRIC = list(SYMMETRIC.keys())[0]
 
 ASYMMETRIC = {'PKCS1 OAEP': handle_pkcs1_oaep}
-DEFAULT_ASYMMETRIC = list(SYMMETRIC.keys())[0]
 
 CIPHERING = reduce(lambda x, y: dict(x, **y), (SYMMETRIC, ASYMMETRIC))
+
+SIGNATURE = {'PSS': signature_pss}
+
+HASH = {'SHA256': hash_sha256, 'MD5': hash_md5, 'Ripemd160': hash_ripemd160}
+
+
+def get_default_algorithm(algorithms: dict):
+    return list(algorithms.keys())[0]
 
 
 #  ### DEFINE LAYOUTS ### #
 
 symmetric_layout = [
-    [sg.Radio(x, 'algorithm', key=x, default=x == DEFAULT_SYMMETRIC) for x in SYMMETRIC.keys()]
+    [sg.Radio(x, 'ciphering', key=x, default=x == get_default_algorithm(SYMMETRIC)) for x in SYMMETRIC.keys()]
 ]
 
 asymmetric_layout = [
-    [sg.Radio(x, 'algorithm', key=x, default=x == DEFAULT_ASYMMETRIC) for x in ASYMMETRIC.keys()]
+    [sg.Radio(x, 'ciphering', key=x, default=x == get_default_algorithm(ASYMMETRIC)) for x in ASYMMETRIC.keys()]
 ]
 
 ciphering_layout = [
@@ -41,11 +47,24 @@ ciphering_layout = [
 ]
 
 signature_layout = [
+    [sg.Frame('Choose signature algorithm',
+              [[sg.Radio(x, 'signature', key=x, default=x == get_default_algorithm(SIGNATURE)) for x in SIGNATURE.keys()]],
+              border_width=3)],
 
+    [sg.Input(key='-RSA_KEY_PATH-'), sg.FileBrowse('Select file with key', file_types=ALLOWED_FILE_TYPES)],
+    [sg.Input(key='-SIGN_MESSAGE_PATH-'), sg.FileBrowse('Select file with message', file_types=ALLOWED_FILE_TYPES)],
+    [sg.Input(key='-SIGN_PATH-'), sg.FileSaveAs('Select file with signature', file_types=ALLOWED_FILE_TYPES)],
+    [sg.Button('Sign message', key='-SIGN-', button_color=('white', 'red'))]
 ]
 
 hash_layout = [
+    [sg.Frame('Choose hash algorithm',
+              [[sg.Radio(x, 'hash', key=x, default=x == get_default_algorithm(HASH)) for x in HASH.keys()]],
+              border_width=3)],
 
+    [sg.Input(key='-HASH_MESSAGE_PATH-'), sg.FileBrowse('Select file with message', file_types=ALLOWED_FILE_TYPES)],
+    [sg.Input(key='-HASH_PATH-'), sg.FileSaveAs('Select file with hash', file_types=ALLOWED_FILE_TYPES)],
+    [sg.Button('Hash message', key='-HASH-', button_color=('white', 'red'))]
 ]
 
 # ### DEFINE TAB LAYOUTS ### #
@@ -119,25 +138,74 @@ def handle_ciphering(event_key: str, values_dict: dict):
     [algorithm] = [k for k in CIPHERING.keys() if values_dict[k]]
 
     data = read_from_file(input_path)
-    key = encode_utf8(read_from_file(values_dict['-KEY_PATH-']))
+    key = read_from_file(values_dict['-KEY_PATH-'])
 
     try:
-        result = CIPHERING[algorithm](convert_input(data), key, mode)
+        result = CIPHERING[algorithm](convert_input(data), encode_utf8(key), mode)
         write_to_file(save_path, convert_output(result))
     except TypeError or ValueError as error:
         error_popup(error, title='Ciphering error')
 
+
+# ### SIGNATURE ### #
+
+def handle_signature(event_key: str, values_dict: dict):
+    if event_key != '-SIGN-':
+        raise ValueError(f'main.handle_signature: Unable to handle event: {event_key}')
+
+    [algorithm] = [k for k in SIGNATURE.keys() if values_dict[k]]
+
+    data = read_from_file(values_dict['-SIGN_MESSAGE_PATH-'])
+    key = read_from_file(values_dict['-RSA_KEY_PATH-'])
+
+    try:
+        result = SIGNATURE[algorithm](encode_utf8(data), encode_utf8(key))
+        write_to_file(values_dict['-SIGN_PATH-'], bytes_to_hex(result))
+    except TypeError or ValueError as error:
+        error_popup(error, title='Signature error')
+
+
+# ### HASH ### #
+
+def handle_hash(event_key: str, values_dict: dict):
+    if event_key != '-HASH-':
+        raise ValueError(f'main.handle_hash: Unable to handle event: {event_key}')
+
+    [algorithm] = [k for k in HASH.keys() if values_dict[k]]
+
+    data = read_from_file(values_dict['-HASH_MESSAGE_PATH-'])
+
+    try:
+        result = HASH[algorithm](encode_utf8(data))
+        write_to_file(values_dict['-HASH_PATH-'], result)
+    except TypeError or ValueError as error:
+        error_popup(error, title='Hash error')
+
+
+# ### EVENT LOOP ### #
 
 while True:
     event, values = window.read()  # type: str, dict
     print(event, values)
     if event == sg.WIN_CLOSED:
         break
-    if event in ['-ENCRYPT-', '-DECRYPT-']:
+    elif event in ['-ENCRYPT-', '-DECRYPT-']:
         if validate_fields(values, ['-PLAINTEXT_PATH-', '-CIPHERTEXT_PATH-', '-KEY_PATH-']):
             error_popup('Please select all the files', title='Validation error')
             continue
 
         handle_ciphering(event, values)
+    elif event == '-SIGN-':
+        if validate_fields(values, ['-RSA_KEY_PATH-', '-SIGN_MESSAGE_PATH-', '-SIGN_PATH-']):
+            error_popup('Please select all the files', title='Validation error')
+            continue
+
+        handle_signature(event, values)
+    elif event == '-HASH-':
+        if validate_fields(values, ['-HASH_MESSAGE_PATH-', '-HASH_PATH-']):
+            error_popup('Please select all the files', title='Validation error')
+            continue
+
+        handle_hash(event, values)
 
 window.close()
