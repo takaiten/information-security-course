@@ -1,0 +1,3 @@
+[submodule "lab4/front"]
+	path = lab4/front
+	url = git@github.com:takaiten/information-security-webapp.git
