@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,12 +20,11 @@ from .configs.roles import *
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
-
 origins = [
     "http://localhost:8080",
 ]
 
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -34,6 +33,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+settings = schemas.Settings()
+
+denylist = set()
+
+
+# --- METHODS --- #
 
 def get_db():
     db = SessionLocal()
@@ -46,6 +51,17 @@ def get_db():
 def get_current_user(authorize: AuthJWT):
     authorize.jwt_required()
     return authorize.get_jwt_subject()
+
+
+@AuthJWT.load_config
+def get_config():
+    return settings
+
+
+@AuthJWT.token_in_denylist_loader
+def check_if_token_in_denylist(decrypted_token):
+    jti = decrypted_token['jti']
+    return jti in denylist
 
 
 @app.exception_handler(AuthJWTException)
@@ -73,6 +89,15 @@ def login(user_login_data: schemas.UserLogin, authorize: AuthJWT = Depends(), db
     access_token = authorize.create_access_token(subject=user.id)
 
     return {'access_token': access_token, 'user': user}
+
+
+@app.post('/logout', response_model=Dict[str, str])
+def logout(authorize: AuthJWT = Depends()):
+    authorize.jwt_required()
+
+    jti = authorize.get_raw_jwt()['jti']
+    denylist.add(jti)
+    return {'detail': 'Access token has been revoke'}
 
 
 # --- SERIAL NUMBER --- #

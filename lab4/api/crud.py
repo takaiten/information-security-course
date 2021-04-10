@@ -1,18 +1,12 @@
 from sqlalchemy.orm import Session
-from fastapi_jwt_auth import AuthJWT
 
 from . import models, schemas
 
 from .utils.crypto import hash_password, generate_salt
-
 from .configs.defaults import *
 
 
 # --- COMMON --- #
-
-@AuthJWT.load_config
-def get_config():
-    return schemas.Settings()
 
 
 def get_by_primary_key(db: Session, primary_key, model):

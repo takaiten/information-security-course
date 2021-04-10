@@ -4,6 +4,8 @@ from pydantic import BaseModel
 class Settings(BaseModel):
     authjwt_secret_key: str = 'secret'
     authjwt_access_token_expires: int = 86400
+    authjwt_denylist_enabled: bool = True
+    authjwt_denylist_token_checks: set = {'access'}
 
 
 # --- USER --- #
