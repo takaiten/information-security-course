@@ -1,10 +1,15 @@
-SSH_HOST = 'ssh.cloud.nstu.ru'
-SSH_PORT = 5330
+import os
+from dotenv import load_dotenv
 
-REMOTE_HOST = '127.0.0.1'
-REMOTE_PORT = 5432
+load_dotenv()
 
-USERNAME = 'dba'
-PASSWORD = 'gamermoment'
+SSH_HOST = os.getenv('SSH_HOST')
+SSH_PORT = os.getenv('SSH_PORT')
 
-DATABASE = 'phone_book_db'
+REMOTE_HOST = os.getenv('REMOTE_HOST')
+REMOTE_PORT = os.getenv('REMOTE_PORT')
+
+USERNAME = os.getenv('USERNAME')
+PASSWORD = os.getenv('PASSWORD')
+
+DATABASE = os.getenv('DATABASE')
