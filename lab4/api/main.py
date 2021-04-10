@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -20,6 +21,18 @@ from .configs.roles import *
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def get_db():
@@ -66,12 +79,12 @@ def login(user_login_data: schemas.UserLogin, authorize: AuthJWT = Depends(), db
 
 @app.get('/serial_number/', response_model=str)
 def check_serial_number(serial_number: str, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
-    db_serial_number = crud.get_serial_number(db, serial_number=serial_number).serial_number
+    db_serial_number = crud.get_serial_number(db, serial_number=serial_number.lower())
 
     if db_serial_number is None:
         raise HTTPException(status_code=400, detail='Invalid serial number')
 
-    return authorize.create_refresh_token(subject=db_serial_number)
+    return authorize.create_refresh_token(subject=db_serial_number.serial_number)
 
 
 # --- ROLES --- #
