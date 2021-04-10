@@ -1,20 +1,27 @@
 from typing import List
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
+from fastapi.responses import JSONResponse
+
+from fastapi_jwt_auth import AuthJWT
+from fastapi_jwt_auth.exceptions import AuthJWTException
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
 
-from .constants.defaults import *
-from .constants.roles import *
+from .utils.crypto import hash_sha256
+
+from .configs.defaults import *
+from .configs.roles import *
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-# Dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -23,18 +30,66 @@ def get_db():
         db.close()
 
 
+def get_current_user(authorize: AuthJWT):
+    authorize.jwt_required()
+    return authorize.get_jwt_subject()
+
+
+@app.exception_handler(AuthJWTException)
+def authjwt_exception_handler(request: Request, exc: AuthJWTException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={'detail': exc.message}
+    )
+
+
+# --- LOGIN --- #
+
+@app.post('/login', response_model=schemas.UserWithToken)
+def login(user_login_data: schemas.UserLogin, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    authorize.jwt_refresh_token_required()
+
+    user = crud.get_user_by_email(db, user_login_data.email)
+
+    if user is None:
+        raise HTTPException(status_code=401, detail='Invalid email')
+
+    if hash_sha256(user_login_data.password + user.salt) != user.hashed_password:
+        raise HTTPException(status_code=401, detail='Invalid password')
+
+    access_token = authorize.create_access_token(subject=user.id)
+
+    return {'access_token': access_token, 'user': user}
+
+
+# --- SERIAL NUMBER --- #
+
+@app.get('/serial_number/', response_model=str)
+def check_serial_number(serial_number: str, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    db_serial_number = crud.get_serial_number(db, serial_number=serial_number).serial_number
+
+    if db_serial_number is None:
+        raise HTTPException(status_code=400, detail='Invalid serial number')
+
+    return authorize.create_refresh_token(subject=db_serial_number)
+
+
 # --- ROLES --- #
 
 @app.get('/roles/', response_model=List[schemas.Role])
-def get_roles(offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT, db: Session = Depends(get_db)):
-    roles = crud.get_roles(db, offset=offset, limit=limit)
-    return roles
+def get_roles(offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT,
+              authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    authorize.jwt_required()
+
+    return crud.get_roles(db, offset=offset, limit=limit)
 
 
 # --- USERS --- #
 
 @app.get('/users/{user_id}', response_model=schemas.User)
-def get_user(user_id: int, db: Session = Depends(get_db)):
+def get_user(user_id: int, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    authorize.jwt_required()
+
     db_user = crud.get_user(db, user_id=user_id)
 
     if db_user is None:
@@ -44,99 +99,72 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 
 @app.get('/users/', response_model=List[schemas.User])
-def get_users(offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT, db: Session = Depends(get_db)):
-    users = crud.get_users(db, offset=offset, limit=limit)
-    return users
+def get_users(offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT,
+              authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    authorize.jwt_required()
+
+    return crud.get_users(db, offset=offset, limit=limit)
 
 
 @app.post('/users/', response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_email(db, email=user.email)
+def create_user(user: schemas.UserCreate, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    current_user = get_current_user(authorize)
 
-    if db_user:
+    if crud.get_user_role_id(db, user_id=current_user) != ADMIN_ID:
+        raise HTTPException(status_code=403, detail='Not enough authority')
+
+    if crud.get_user_by_email(db, email=user.email):
         raise HTTPException(status_code=400, detail='Email already registered')
 
-    return crud.create_user(db=db, user=user)
+    try:
+        return crud.create_user(db=db, user=user)
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail='No role with such id')
 
 
-@app.patch('/users/{user_id}', response_model=int)
-def update_user_data(user_id: int, user_data: schemas.UserUpdate, db: Session = Depends(get_db)):
-    updated_count = crud.update_user_data(db, user_id=user_id, user_data=user_data)
-    return updated_count
+@app.delete('/users/{user_id}')
+def delete_user(user_id: int, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    current_user = get_current_user(authorize)
+
+    if crud.get_user_role_id(db, user_id=current_user) != ADMIN_ID:
+        raise HTTPException(status_code=403, detail='Not enough authority')
+
+    if crud.delete_user(db, user_id=user_id) == 0:
+        raise HTTPException(status_code=400, detail='No user with such id')
 
 
-@app.delete('/users/{user_id}', response_model=int)
-def delete_user(user_id: int, db: Session = Depends(get_db)):
-    deleted_count = crud.delete_user(db, user_id=user_id)
-    return deleted_count
-
-
-# TODO: authorization method
-
-
-# --- Phonebook --- #
+# --- PHONEBOOK --- #
 
 @app.get('/phonebook/', response_model=List[schemas.Phone])
-def get_phonebook(user_id: int, offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT,
-                  db: Session = Depends(get_db)):
-    db_user_role_id = crud.get_user_role_id(db, user_id=user_id)
+def get_phonebook(offset: int = DEFAULT_OFFSET, limit: int = DEFAULT_LIMIT,
+                  authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    authorize.jwt_required()
 
-    if db_user_role_id is None:
-        raise HTTPException(status_code=404, detail='User not found')
-
-    phonebook = crud.get_phonebook(db, offset=offset, limit=limit)
-
-    if db_user_role_id == USER['id']:
-        return list(map(lambda x: x.pop('address'), phonebook))
-
-    return phonebook
+    return crud.get_phonebook(db, offset=offset, limit=limit)
 
 
-@app.put('/phonebook/', response_model=int)
-def add_phone(user_id: int, phone: schemas.PhoneCreate, db: Session = Depends(get_db)):
-    db_user_role_id = crud.get_user_role_id(db, user_id=user_id)
+@app.post('/phonebook/', response_model=schemas.Phone)
+def create_phonebook_entry(phone: schemas.PhoneCreate, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    current_user = get_current_user(authorize)
 
-    if db_user_role_id is None:
-        raise HTTPException(status_code=404, detail='User not found')
-
-    if db_user_role_id == USER['id']:
+    if crud.get_user_role_id(db, user_id=current_user) == USER_ID:
         raise HTTPException(status_code=403, detail='Not enough authority')
 
-    db_phone = crud.get_phone_by_number(db, phone_number=phone.telephone)
-
-    if db_phone:
+    if crud.get_phonebook_entry_by_telephone(db, telephone=phone.telephone):
         raise HTTPException(status_code=400, detail='Phone already registered')
 
-    return crud.create_phone_number(db, phone=phone)
+    return crud.create_phonebook_entry(db, phone=phone)
 
 
-@app.delete('/phonebook/{phone_id}', response_model=int)
-def delete_phone(user_id: int, phone_id: int, db: Session = Depends(get_db)):
-    db_user_role_id = crud.get_user_role_id(db, user_id=user_id)
+@app.delete('/phonebook/{phone_id}')
+def delete_phone(phone_id: int, authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+    current_user = get_current_user(authorize)
 
-    if db_user_role_id is None:
-        raise HTTPException(status_code=404, detail='User not found')
-
-    if db_user_role_id == USER['id']:
+    if crud.get_user_role_id(db, user_id=current_user) == USER_ID:
         raise HTTPException(status_code=403, detail='Not enough authority')
 
-    db_phone = crud.get_phone(db, phone_id=phone_id)
-
-    if db_phone is None:
+    if crud.get_phonebook_entry(db, phone_id=phone_id) is None:
         raise HTTPException(status_code=404, detail='No such phone')
 
-    return crud.delete_phone(db, phone_id=phone_id)
-
-
-# --- SERIAL NUMBER --- #
-
-@app.post('/serial_number/', response_model=str)
-def check_serial_number(serial_number: str, db: Session = Depends(get_db)):
-    # TODO: update serial number storage system
-
-    db_serial_number = crud.get_serial_number(db, serial_number=serial_number)
-
-    if db_serial_number is None:
-        raise HTTPException(status_code=400, detail='Invalid serial number')
-
-    return db_serial_number
+    if crud.delete_phonebook_entry(db, phone_id=phone_id) == 0:
+        raise HTTPException(status_code=400, detail='No phone with such id')

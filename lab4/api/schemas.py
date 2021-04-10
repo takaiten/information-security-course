@@ -1,12 +1,24 @@
-from typing import List, Optional
-
 from pydantic import BaseModel
+
+
+class Settings(BaseModel):
+    authjwt_secret_key: str = 'secret'
+    authjwt_access_token_expires: int = 86400
 
 
 # --- USER --- #
 
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+
+class UserAuthorize(BaseModel):
+    salt: str
+    hashed_password: str
+
+
 class UserBase(BaseModel):
-    # id: int
     name: str
     email: str
     role_id: int
@@ -16,10 +28,6 @@ class UserCreate(UserBase):
     password: str
 
 
-class UserUpdate(UserBase):
-    pass
-
-
 class User(UserBase):
     id: int
 
@@ -27,10 +35,14 @@ class User(UserBase):
         orm_mode = True
 
 
+class UserWithToken(BaseModel):
+    user: User
+    access_token: str
+
+
 # --- ROLE --- #
 
 class RoleBase(BaseModel):
-    # id: int
     name: str
 
 
@@ -40,7 +52,6 @@ class RoleCreate(RoleBase):
 
 class Role(RoleBase):
     id: int
-    users: List[User] = []
 
     class Config:
         orm_mode = True
@@ -49,7 +60,6 @@ class Role(RoleBase):
 # --- PHONE --- #
 
 class PhoneBase(BaseModel):
-    # id: int
     name: str
     telephone: str
     address: str
@@ -62,20 +72,5 @@ class PhoneCreate(PhoneBase):
 class Phone(PhoneBase):
     id: int
 
-    class Config:
-        orm_mode = True
-
-
-# --- SERIAL NUMBER --- #
-
-class SerialNumberBase(BaseModel):
-    serial_number: str
-
-
-class SerialNumberCreate(SerialNumberBase):
-    pass
-
-
-class SerialNumber(SerialNumberBase):
     class Config:
         orm_mode = True
