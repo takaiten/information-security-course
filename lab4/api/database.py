@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sshtunnel import SSHTunnelForwarder
 
-from .configs.connection import *
+from .configs.db_connection import *
 
 server = SSHTunnelForwarder(
     (SSH_HOST, SSH_PORT),

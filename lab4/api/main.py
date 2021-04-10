@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from fastapi.responses import JSONResponse
-
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
@@ -17,25 +16,23 @@ from .utils.crypto import hash_sha256
 
 from .configs.defaults import *
 from .configs.roles import *
+from .configs.app_config import *
+
+
+# --- APP --- #
 
 models.Base.metadata.create_all(bind=engine)
-
-origins = [
-    "http://localhost:8080",
-]
 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ORIGINS,
+    allow_credentials=ALLOW_CREDENTIALS,
+    allow_methods=ALLOW_METHODS,
+    allow_headers=ALLOW_HEADERS,
 )
 
-settings = schemas.Settings()
-
-denylist = set()
+deny_set = set()
 
 
 # --- METHODS --- #
@@ -55,13 +52,13 @@ def get_current_user(authorize: AuthJWT):
 
 @AuthJWT.load_config
 def get_config():
-    return settings
+    return schemas.Settings()
 
 
 @AuthJWT.token_in_denylist_loader
 def check_if_token_in_denylist(decrypted_token):
     jti = decrypted_token['jti']
-    return jti in denylist
+    return jti in deny_set
 
 
 @app.exception_handler(AuthJWTException)
@@ -96,7 +93,7 @@ def logout(authorize: AuthJWT = Depends()):
     authorize.jwt_required()
 
     jti = authorize.get_raw_jwt()['jti']
-    denylist.add(jti)
+    deny_set.add(jti)
     return {'detail': 'Access token has been revoke'}
 
 
