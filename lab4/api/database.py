@@ -1,21 +1,16 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sshtunnel import SSHTunnelForwarder
+from dotenv import dotenv_values
 
-from .configs.db_connection import *
+config = dotenv_values()
 
-server = SSHTunnelForwarder(
-    (SSH_HOST, SSH_PORT),
-    ssh_username=USERNAME,
-    ssh_password=PASSWORD,
-    remote_bind_address=(REMOTE_HOST, REMOTE_PORT)
-)
+connection_string = ('postgresql://' +
+                     config['USERNAME'] + ':' + config['PASSWORD'] + '@' +
+                     config['REMOTE_HOST'] + ':' + config['REMOTE_PORT'] + '/' +
+                     config['DATABASE'])
 
-server.start()
-local_port = str(server.local_bind_port)
-
-engine = create_engine(f'postgresql://{USERNAME}:{PASSWORD}@{REMOTE_HOST}:{local_port}/{DATABASE}')
+engine = create_engine(connection_string)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
