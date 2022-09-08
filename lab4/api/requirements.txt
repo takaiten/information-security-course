@@ -1,0 +1,11 @@
+fastapi==0.63.0
+fastapi-jwt-auth==0.5.0
+psycopg2==2.8.6
+pycrypto==2.6.1
+pycryptodome==3.10.1
+pycryptodomex==3.10.1
+pydantic==1.8.1
+python-dotenv==0.17.0
+SQLAlchemy==1.4.7
+sshtunnel==0.4.0
+uvicorn==0.13.4
